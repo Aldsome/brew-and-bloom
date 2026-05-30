@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Brew & Bloom — Artisan Coffee, Delivered</title>
+  <meta name="description" content="Order specialty coffee, tea, and pastries from Brew & Bloom. Fast checkout with GCash, Maya, online banking, and cards." />
+
+  <!-- ==========================================================
+       FONTS  (change typography here)
+       ========================================================== -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- Apply saved theme before paint to avoid flash -->
+  <script>
+    (function () {
+      try {
+        var saved = localStorage.getItem('bb-theme');
+        var theme = (saved === 'dark' || saved === 'light')
+          ? saved
+          : (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (e) { /* ignore */ }
+    })();
+  </script>
+</head>
+<body>
+
+  <!-- ==========================================================
+       TOP ANNOUNCEMENT BAR  (promo / shipping notice)
+       ========================================================== -->
+  <div class="announcement-bar">
+    <span>☕ Free delivery on orders over ₱500 — within Metro Manila</span>
+  </div>
+
+  <!-- ==========================================================
+       HEADER / NAVIGATION
+       ========================================================== -->
+  <header class="site-header" id="siteHeader">
+    <div class="container nav-wrap">
+      <a href="#home" class="brand" aria-label="Brew and Bloom home">
+        <span class="brand-mark">B&amp;B</span>
+        <span class="brand-name">Brew &amp; Bloom</span>
+      </a>
+
+      <nav class="primary-nav" id="primaryNav" aria-label="Primary">
+        <a href="#home">Home</a>
+        <a href="#menu">Menu</a>
+        <a href="#featured">Featured</a>
+        <a href="#about">Our Story</a>
+        <a href="#contact">Contact</a>
+      </nav>
+
+      <div class="nav-actions">
+        <button class="icon-btn theme-toggle" id="themeToggleBtn" aria-label="Toggle night mode">
+          <svg class="sun" viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="4" fill="currentColor"/>
+            <g stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <line x1="12" y1="2"  x2="12" y2="5"/>
+              <line x1="12" y1="19" x2="12" y2="22"/>
+              <line x1="2"  y1="12" x2="5"  y2="12"/>
+              <line x1="19" y1="12" x2="22" y2="12"/>
+              <line x1="4.2" y1="4.2"  x2="6.3" y2="6.3"/>
+              <line x1="17.7" y1="17.7" x2="19.8" y2="19.8"/>
+              <line x1="4.2" y1="19.8" x2="6.3" y2="17.7"/>
+              <line x1="17.7" y1="6.3" x2="19.8" y2="4.2"/>
+            </g>
+          </svg>
+          <svg class="moon" viewBox="0 0 24 24" aria-hidden="true">
+            <path fill="currentColor" d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"/>
+          </svg>
+        </button>
+        <button class="icon-btn cart-btn" id="openCartBtn" aria-label="Open cart">
+          <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+            <path fill="currentColor" d="M7 4h-2l-1 2v2h2l3.6 7.59-1.35 2.44A2 2 0 0 0 10 21h12v-2H10.42a.25.25 0 0 1-.22-.37L11.1 17h7.45a2 2 0 0 0 1.8-1.11l3.24-6.5A1 1 0 0 0 22.7 8H6.21L5.27 6H3V4z"/>
+            <circle cx="10" cy="22" r="1.5" fill="currentColor"/>
+            <circle cx="20" cy="22" r="1.5" fill="currentColor"/>
+          </svg>
+          <span class="cart-badge" id="cartBadge">0</span>
+        </button>
+        <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==========================================================
+       HERO SECTION  (main banner)
+       ========================================================== -->
+  <section class="hero" id="home">
+    <div class="container hero-grid">
+      <div class="hero-copy">
+        <p class="eyebrow">Freshly roasted • Locally loved</p>
+        <h1>Sip the moment.<br/>Bloom your day.</h1>
+        <p class="lede">Artisan coffee, slow-steeped teas, and buttery pastries — delivered to your door in 30 minutes or less.</p>
+        <div class="hero-cta">
+          <a href="#menu" class="btn btn-primary">Order Now</a>
+          <a href="#featured" class="btn btn-ghost">See Featured</a>
+        </div>
+        <ul class="hero-meta">
+          <li>★ 4.9 rating</li>
+          <li>⏱ 30-min delivery</li>
+          <li>🌱 Ethically sourced</li>
+        </ul>
+      </div>
+
+      <!-- IMAGE PLACEHOLDER: replace with hero photo -->
+      <div class="hero-art" role="img" aria-label="Coffee cup on saucer">
+        <div class="placeholder-img hero-placeholder">
+          <span>Hero Image Placeholder</span>
+        </div>
+        <div class="hero-floater floater-1">🌿</div>
+        <div class="hero-floater floater-2">🌸</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================
+       CATEGORY CHIPS  (filter strip)
+       ========================================================== -->
+  <section class="categories container" id="categories">
+    <div class="chips" role="tablist" aria-label="Menu categories">
+      <button class="chip active" data-category="all" role="tab">All</button>
+      <button class="chip" data-category="coffee" role="tab">Coffee</button>
+      <button class="chip" data-category="tea" role="tab">Tea</button>
+      <button class="chip" data-category="cold" role="tab">Cold Brews</button>
+      <button class="chip" data-category="pastry" role="tab">Pastries</button>
+      <button class="chip" data-category="bundle" role="tab">Bundles</button>
+    </div>
+  </section>
+
+  <!-- ==========================================================
+       FEATURED PROMOTIONS  (highlight cards)
+       ========================================================== -->
+  <section class="featured container" id="featured">
+    <div class="section-head">
+      <h2>Featured Today</h2>
+      <p>Hand-picked drinks our baristas can't stop making.</p>
+    </div>
+
+    <div class="featured-grid">
+      <article class="promo-card">
+        <div class="placeholder-img promo-img"><span>Promo Image</span></div>
+        <div class="promo-body">
+          <h3>Pink Rose Latte</h3>
+          <p>Rose-infused espresso with steamed oat milk.</p>
+          <a href="#menu" class="link-arrow">Try it →</a>
+        </div>
+      </article>
+      <article class="promo-card">
+        <div class="placeholder-img promo-img"><span>Promo Image</span></div>
+        <div class="promo-body">
+          <h3>Matcha Bloom</h3>
+          <p>Ceremonial matcha layered over vanilla cream.</p>
+          <a href="#menu" class="link-arrow">Try it →</a>
+        </div>
+      </article>
+      <article class="promo-card">
+        <div class="placeholder-img promo-img"><span>Promo Image</span></div>
+        <div class="promo-body">
+          <h3>Barista's Bundle</h3>
+          <p>Any 2 drinks + 1 pastry — save up to ₱90.</p>
+          <a href="#menu" class="link-arrow">Build yours →</a>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ==========================================================
+       MENU GRID  (products rendered by JS)
+       ========================================================== -->
+  <section class="menu container" id="menu">
+    <div class="section-head">
+      <h2>Our Menu</h2>
+      <p>Tap a category above to filter. Add items to your cart to check out.</p>
+    </div>
+
+    <div class="menu-grid" id="menuGrid">
+      <!-- product cards injected via script.js -->
+    </div>
+  </section>
+
+  <!-- ==========================================================
+       ABOUT / STORY SECTION
+       ========================================================== -->
+  <section class="about" id="about">
+    <div class="container about-grid">
+      <!-- IMAGE PLACEHOLDER: replace with shop photo -->
+      <div class="placeholder-img about-img"><span>About Image</span></div>
+      <div class="about-copy">
+        <p class="eyebrow">Our story</p>
+        <h2>Small batch. Big heart.</h2>
+        <p>Brew &amp; Bloom started as a weekend pop-up in Quezon City. Today, we hand-roast beans from Benguet and Sagada and partner with local pastry makers to bring you something familiar — and a little surprising — in every cup.</p>
+        <ul class="bullets">
+          <li>Direct-trade Filipino beans</li>
+          <li>Compostable cups &amp; lids</li>
+          <li>Barista-led recipes, refreshed monthly</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================
+       CONTACT / FOOTER
+       ========================================================== -->
+  <footer class="site-footer" id="contact">
+    <div class="container footer-grid">
+      <div>
+        <div class="brand footer-brand">
+          <span class="brand-mark">B&amp;B</span>
+          <span class="brand-name">Brew &amp; Bloom</span>
+        </div>
+        <p class="muted">Open daily, 7am–9pm</p>
+        <p class="muted">123 Katipunan Ave, Quezon City</p>
+      </div>
+      <div>
+        <h4>Contact</h4>
+        <p class="muted">+63 917 000 0000</p>
+        <p class="muted">hello@brewandbloom.ph</p>
+      </div>
+      <div>
+        <h4>Follow</h4>
+        <p class="muted">@brewandbloom on Instagram, TikTok, Facebook</p>
+      </div>
+      <div>
+        <h4>Newsletter</h4>
+        <form class="newsletter" onsubmit="event.preventDefault(); this.querySelector('input').value=''; alert('Thanks for subscribing!');">
+          <input type="email" placeholder="Email address" required />
+          <button class="btn btn-primary" type="submit">Join</button>
+        </form>
+      </div>
+    </div>
+    <div class="footer-base">
+      <p>© <span id="year"></span> Brew &amp; Bloom. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- ==========================================================
+       CART DRAWER  (slide-out)
+       ========================================================== -->
+  <aside class="cart-drawer" id="cartDrawer" aria-hidden="true" aria-label="Shopping cart">
+    <div class="drawer-head">
+      <h3>Your Cart</h3>
+      <button class="icon-btn close-btn" id="closeCartBtn" aria-label="Close cart">✕</button>
+    </div>
+    <div class="drawer-body" id="cartItems">
+      <p class="empty-state" id="cartEmpty">Your cart is empty. Add something tasty ☕</p>
+    </div>
+    <div class="drawer-foot">
+      <div class="row">
+        <span>Subtotal</span>
+        <strong id="cartSubtotal">₱0.00</strong>
+      </div>
+      <div class="row muted small">
+        <span>Delivery fee</span>
+        <span id="cartDelivery">₱0.00</span>
+      </div>
+      <div class="row total">
+        <span>Total</span>
+        <strong id="cartTotal">₱0.00</strong>
+      </div>
+      <button class="btn btn-primary btn-block" id="checkoutBtn" disabled>Checkout</button>
+    </div>
+  </aside>
+
+  <!-- ==========================================================
+       CHECKOUT MODAL  (order form + payment)
+       ========================================================== -->
+  <div class="modal" id="checkoutModal" aria-hidden="true">
+    <div class="modal-card" role="dialog" aria-labelledby="checkoutTitle">
+      <div class="modal-head">
+        <h3 id="checkoutTitle">Checkout</h3>
+        <button class="icon-btn close-btn" id="closeCheckoutBtn" aria-label="Close checkout">✕</button>
+      </div>
+
+      <form class="checkout-form" id="checkoutForm">
+
+        <!-- ----- Delivery details ----- -->
+        <fieldset>
+          <legend>Delivery details</legend>
+          <div class="grid-2">
+            <label>Full name
+              <input type="text" name="name" required />
+            </label>
+            <label>Phone
+              <input type="tel" name="phone" placeholder="+63" required />
+            </label>
+          </div>
+          <label>Delivery address
+            <input type="text" name="address" placeholder="Unit, street, barangay, city" required />
+          </label>
+          <label>Notes (optional)
+            <textarea name="notes" rows="2" placeholder="Gate code, drink prefs, etc."></textarea>
+          </label>
+        </fieldset>
+
+        <!-- ==========================================================
+             PAYMENT METHODS
+             - GCash, Maya, online banking prioritized (PH)
+             - Card option for VISA / Mastercard / JCB
+             - Integration is stubbed; see comments below
+             ========================================================== -->
+        <fieldset>
+          <legend>Payment method</legend>
+
+          <div class="pay-options">
+
+            <!-- GCash -->
+            <label class="pay-option">
+              <input type="radio" name="payment" value="gcash" checked />
+              <span class="pay-icon" aria-hidden="true">
+                <!-- IMAGE PLACEHOLDER: replace with GCash logo -->
+                <span class="logo-pill" style="--logo-bg:#0070E0;">GCash</span>
+              </span>
+              <span class="pay-label">
+                <strong>GCash</strong>
+                <small>Pay via GCash wallet</small>
+              </span>
+              <!-- TODO: Integrate GCash via Xendit / PayMongo / Adyen.
+                   Endpoint stub — replace with real API call:
+                   POST /api/payments/gcash { amount, reference } -->
+            </label>
+
+            <!-- Maya -->
+            <label class="pay-option">
+              <input type="radio" name="payment" value="maya" />
+              <span class="pay-icon" aria-hidden="true">
+                <!-- IMAGE PLACEHOLDER: replace with Maya logo -->
+                <span class="logo-pill" style="--logo-bg:#19D27C;color:#0A2540;">Maya</span>
+              </span>
+              <span class="pay-label">
+                <strong>Maya</strong>
+                <small>Pay via Maya wallet</small>
+              </span>
+              <!-- TODO: Maya Business Checkout integration goes here. -->
+            </label>
+
+            <!-- Online banking (PH) -->
+            <label class="pay-option">
+              <input type="radio" name="payment" value="bank" />
+              <span class="pay-icon" aria-hidden="true">
+                <span class="logo-pill" style="--logo-bg:#7BB661;">BPI/BDO/UB</span>
+              </span>
+              <span class="pay-label">
+                <strong>Online Banking</strong>
+                <small>BPI, BDO, UnionBank, Metrobank, RCBC</small>
+              </span>
+              <!-- TODO: PESONet / InstaPay redirect via PayMongo sources. -->
+            </label>
+
+            <!-- Card -->
+            <label class="pay-option">
+              <input type="radio" name="payment" value="card" />
+              <span class="pay-icon" aria-hidden="true">
+                <!-- IMAGE PLACEHOLDER: replace with VISA / Mastercard / JCB logos -->
+                <span class="logo-pill" style="--logo-bg:#1A1F71;">VISA</span>
+                <span class="logo-pill" style="--logo-bg:#EB001B;">MC</span>
+              </span>
+              <span class="pay-label">
+                <strong>Credit / Debit Card</strong>
+                <small>VISA, Mastercard, JCB</small>
+              </span>
+              <!-- TODO: Tokenize card via Stripe Elements / PayMongo. -->
+            </label>
+
+            <!-- Cash on delivery -->
+            <label class="pay-option">
+              <input type="radio" name="payment" value="cod" />
+              <span class="pay-icon" aria-hidden="true">
+                <span class="logo-pill" style="--logo-bg:#C97C5D;">COD</span>
+              </span>
+              <span class="pay-label">
+                <strong>Cash on Delivery</strong>
+                <small>Pay the rider when your order arrives</small>
+              </span>
+            </label>
+
+          </div>
+
+          <!-- Card details (only shown when "card" selected) -->
+          <div class="card-fields" id="cardFields" hidden>
+            <div class="grid-2">
+              <label>Card number
+                <input type="text" inputmode="numeric" name="cardNumber" placeholder="1234 5678 9012 3456" autocomplete="cc-number" />
+              </label>
+              <label>Name on card
+                <input type="text" name="cardName" autocomplete="cc-name" />
+              </label>
+            </div>
+            <div class="grid-2">
+              <label>Expiry (MM/YY)
+                <input type="text" name="cardExpiry" placeholder="MM/YY" autocomplete="cc-exp" />
+              </label>
+              <label>CVV
+                <input type="text" inputmode="numeric" name="cardCvv" placeholder="123" autocomplete="cc-csc" />
+              </label>
+            </div>
+            <p class="muted small">🔒 Card details are encrypted. (Demo only — no real charge is made.)</p>
+          </div>
+        </fieldset>
+
+        <!-- ----- Summary ----- -->
+        <fieldset class="summary-box">
+          <legend>Order summary</legend>
+          <div class="row"><span>Subtotal</span><strong id="checkoutSubtotal">₱0.00</strong></div>
+          <div class="row muted small"><span>Delivery fee</span><span id="checkoutDelivery">₱0.00</span></div>
+          <div class="row total"><span>Total</span><strong id="checkoutTotal">₱0.00</strong></div>
+        </fieldset>
+
+        <button class="btn btn-primary btn-block" type="submit">Place Order</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================================
+       ITEM CUSTOMIZER MODAL  (per-item options: size, milk,
+       sugar, add-ons, quantity, notes — opens from product card
+       or from "Edit" in the cart)
+       ========================================================== -->
+  <div class="modal" id="customizerModal" aria-hidden="true">
+    <div class="modal-card customizer-card" role="dialog" aria-labelledby="customizerTitle">
+      <div class="modal-head">
+        <h3 id="customizerTitle">Customize your order</h3>
+        <button class="icon-btn close-btn" id="closeCustomizerBtn" aria-label="Close customizer">✕</button>
+      </div>
+
+      <div class="customizer-body" id="customizerBody">
+        <!-- Hero strip -->
+        <div class="cz-hero">
+          <div class="placeholder-img cz-img" id="czImage" aria-hidden="true"><span></span></div>
+          <div class="cz-hero-text">
+            <p class="eyebrow" id="czCategory">Coffee</p>
+            <h4 id="czName">Item name</h4>
+            <p class="muted small" id="czDesc">Item description</p>
+            <p class="cz-base-price"><span id="czBasePrice">₱0.00</span></p>
+          </div>
+        </div>
+
+        <form id="customizerForm" class="cz-form">
+
+          <!-- Size -->
+          <section class="cz-section" id="czSizeSection">
+            <h5>Size</h5>
+            <div class="cz-options" id="czSizeOptions" role="radiogroup"></div>
+          </section>
+
+          <!-- Temperature -->
+          <section class="cz-section" id="czTempSection">
+            <h5>Serve it</h5>
+            <div class="cz-options" id="czTempOptions" role="radiogroup"></div>
+          </section>
+
+          <!-- Milk -->
+          <section class="cz-section" id="czMilkSection">
+            <h5>Milk</h5>
+            <div class="cz-options" id="czMilkOptions" role="radiogroup"></div>
+          </section>
+
+          <!-- Sugar level -->
+          <section class="cz-section" id="czSugarSection">
+            <h5>Sweetness</h5>
+            <div class="cz-options cz-pill-row" id="czSugarOptions" role="radiogroup"></div>
+          </section>
+
+          <!-- Add-ons -->
+          <section class="cz-section" id="czAddonsSection">
+            <h5>Add-ons <span class="muted small">(optional)</span></h5>
+            <div class="cz-addons" id="czAddonsOptions"></div>
+          </section>
+
+          <!-- Notes -->
+          <section class="cz-section">
+            <h5>Special instructions <span class="muted small">(optional)</span></h5>
+            <textarea id="czNotes" rows="2" placeholder="e.g., less ice, decaf, light foam"></textarea>
+          </section>
+
+          <!-- Qty + Add -->
+          <div class="cz-footer">
+            <div class="qty-stepper" aria-label="Quantity">
+              <button type="button" id="czQtyDec" aria-label="Decrease">−</button>
+              <span id="czQty">1</span>
+              <button type="button" id="czQtyInc" aria-label="Increase">+</button>
+            </div>
+            <button type="submit" class="btn btn-primary cz-add-btn" id="czAddBtn">
+              <span id="czAddLabel">Add to cart</span>
+              <span class="cz-total" id="czTotal">₱0.00</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================
+       CONFIRMATION TOAST
+       ========================================================== -->
+  <div class="toast" id="toast" aria-live="polite"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
