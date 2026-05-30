@@ -407,7 +407,12 @@ function openCustomizer(itemId, opts = {}) {
   // If no customization at all → just add 1 and toast.
   if (!canCustomize && !opts.editLineKey) {
     addLine(item.id, defaultConfigFor(item), 1);
-    showToast(`Added ${item.name} to cart`);
+    showToast(`${item.name} added to cart`, {
+      variant: 'success',
+      icon: '✓',
+      subtitle: 'Tap the cart to checkout',
+    });
+    flyToCart(item.emoji, opts.sourceEl);
     return;
   }
 
@@ -470,12 +475,22 @@ function openCustomizer(itemId, opts = {}) {
     e.preventDefault();
     if (state.editingLineKey) {
       updateLine(state.editingLineKey, item.id, config, state.pendingQty);
-      showToast(`Updated ${item.name}`);
+      showToast(`${item.name} updated`, { icon: '✎' });
+      closeCustomizer();
     } else {
       addLine(item.id, config, state.pendingQty);
-      showToast(`Added ${item.name} to cart`);
+      const qty = state.pendingQty;
+      showToast(`${item.name} added to cart`, {
+        variant: 'success',
+        icon: '✓',
+        subtitle: qty > 1
+          ? `${qty} × added • tap the cart to checkout`
+          : 'Tap the cart to checkout',
+      });
+      // Read source position BEFORE closing modal (close hides it).
+      flyToCart(item.emoji, $('#czAddBtn'));
+      closeCustomizer();
     }
-    closeCustomizer();
   };
 
   // Open
@@ -541,11 +556,80 @@ function toggleTheme() {
    TOAST
    ========================================================== */
 let toastTimer;
-function showToast(msg) {
-  toastEl.textContent = msg;
+function showToast(msg, opts = {}) {
+  const { variant = 'default', subtitle = '', icon = '' } = opts;
+
+  toastEl.classList.toggle('success', variant === 'success');
+
+  const iconHtml = icon
+    ? `<span class="toast-icon" aria-hidden="true">${icon}</span>`
+    : '';
+  const subtitleHtml = subtitle ? `<small>${subtitle}</small>` : '';
+  toastEl.innerHTML = `
+    ${iconHtml}
+    <span class="toast-text">${msg}${subtitleHtml}</span>
+  `;
+
   toastEl.classList.add('show');
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2400);
+  toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2600);
+}
+
+/* ==========================================================
+   FLY-TO-CART ANIMATION
+   - Spawns a floating copy of the item emoji at the source
+     button, arcs it across the screen toward the cart, and
+     shakes the cart on impact.
+   - sourceEl = the button the user just pressed (for start xy).
+   ========================================================== */
+function flyToCart(emoji, sourceEl) {
+  const cartBtn = $('#openCartBtn');
+  if (!cartBtn) return;
+
+  // No source? Just shake the cart so feedback still happens.
+  if (!sourceEl) { shakeCart(); return; }
+
+  const sRect = sourceEl.getBoundingClientRect();
+  const cRect = cartBtn.getBoundingClientRect();
+  const startX = sRect.left + sRect.width  / 2;
+  const startY = sRect.top  + sRect.height / 2;
+  const endX   = cRect.left + cRect.width  / 2;
+  const endY   = cRect.top  + cRect.height / 2;
+
+  const fly = document.createElement('span');
+  fly.className = 'fly-to-cart';
+  fly.textContent = emoji || '🛒';
+  fly.setAttribute('aria-hidden', 'true');
+  fly.style.setProperty('--x0', startX + 'px');
+  fly.style.setProperty('--y0', startY + 'px');
+  fly.style.setProperty('--tx', (endX - startX) + 'px');
+  fly.style.setProperty('--ty', (endY - startY) + 'px');
+  document.body.appendChild(fly);
+
+  fly.addEventListener('animationend', () => {
+    fly.remove();
+    shakeCart();
+  }, { once: true });
+
+  // Safety net: if animationend never fires, clean up.
+  setTimeout(() => { if (fly.isConnected) { fly.remove(); shakeCart(); } }, 1200);
+}
+
+function shakeCart() {
+  const btn   = $('#openCartBtn');
+  const badge = $('#cartBadge');
+  if (!btn || !badge) return;
+
+  btn.classList.remove('shake');
+  badge.classList.remove('pulse');
+  void btn.offsetWidth; // reflow → restart animation on rapid taps
+  btn.classList.add('shake');
+  badge.classList.add('pulse');
+
+  setTimeout(() => {
+    btn.classList.remove('shake');
+    badge.classList.remove('pulse');
+  }, 600);
 }
 
 /* ==========================================================
@@ -602,7 +686,7 @@ function bindEvents() {
   // Menu grid (open customizer or quick-add)
   menuGrid.addEventListener('click', (e) => {
     const id = e.target.dataset.open;
-    if (id) openCustomizer(id);
+    if (id) openCustomizer(id, { sourceEl: e.target });
   });
 
   // Cart drawer controls

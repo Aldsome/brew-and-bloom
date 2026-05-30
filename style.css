@@ -739,13 +739,111 @@ button { font-family: inherit; cursor: pointer; }
   line-height: 1.35;
 }
 
-/* Add-to-cart pulse */
-@keyframes pulse {
+/* ==========================================================
+   ADD-TO-CART FEEDBACK
+   - .fly-to-cart  — emoji arcs from source button into the cart
+   - .cart-btn.shake — cart wobbles on impact
+   - .cart-badge.pulse — number bounces
+   - Toast gets a checkmark and brand-green accent
+   ========================================================== */
+
+/* Flying item — uses CSS vars set from JS:
+   --x0,--y0 = starting viewport coords (source center)
+   --tx,--ty = delta from source to cart center */
+.fly-to-cart {
+  position: fixed;
+  left: 0; top: 0;
+  font-size: 2.4rem;
+  pointer-events: none;
+  z-index: 110;
+  filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.28));
+  --x0: 0px; --y0: 0px; --tx: 0px; --ty: 0px;
+  animation: flyArc .85s cubic-bezier(.55, .05, .8, .35) forwards;
+  will-change: transform, opacity;
+}
+@keyframes flyArc {
+  0% {
+    transform: translate(calc(var(--x0) - 50%), calc(var(--y0) - 50%))
+               scale(1) rotate(0);
+    opacity: 1;
+  }
+  55% {
+    transform: translate(
+                 calc(var(--x0) + var(--tx) * 0.55 - 50%),
+                 calc(var(--y0) + var(--ty) * 0.25 - 90px - 50%)
+               )
+               scale(1.15) rotate(220deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(
+                 calc(var(--x0) + var(--tx) - 50%),
+                 calc(var(--y0) + var(--ty) - 50%)
+               )
+               scale(.25) rotate(540deg);
+    opacity: .35;
+  }
+}
+
+/* Cart shake on impact — like the cart got bonked */
+@keyframes cartShake {
+  0%, 100% { transform: translateX(0) rotate(0); }
+  12% { transform: translate(-5px, 2px) rotate(-9deg) scale(1.1); }
+  24% { transform: translate(5px, -1px) rotate(7deg)  scale(1.08); }
+  38% { transform: translate(-4px, 1px) rotate(-5deg); }
+  52% { transform: translate(3px, 0)    rotate(4deg); }
+  66% { transform: translate(-2px, 0)   rotate(-2deg); }
+  80% { transform: translate(1px, 0)    rotate(1deg); }
+}
+.cart-btn.shake {
+  animation: cartShake .55s ease;
+  background: var(--green-100);
+  color: var(--primary-deep);
+}
+
+@keyframes badgePulse {
   0%   { transform: scale(1); }
-  40%  { transform: scale(1.18); }
+  35%  { transform: scale(1.5); }
+  60%  { transform: scale(.9); }
   100% { transform: scale(1); }
 }
-.cart-badge.pulse { animation: pulse .35s ease; }
+.cart-badge.pulse {
+  animation: badgePulse .5s cubic-bezier(.36, 1.5, .6, 1);
+}
+
+/* Richer toast styling */
+.toast {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 20px 12px 14px;
+  border-radius: 14px;
+  font-weight: 500;
+  background: var(--ink);
+  color: var(--white);
+}
+.toast.success {
+  background: var(--primary-deep);
+  color: var(--white);
+}
+.toast .toast-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.18);
+  font-size: .9rem;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+.toast .toast-text { line-height: 1.3; }
+.toast .toast-text small {
+  display: block;
+  font-size: .76rem;
+  opacity: .85;
+  font-weight: 400;
+  margin-top: 2px;
+}
 
 /* ==========================================================
    ABOUT SECTION
