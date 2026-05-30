@@ -14,7 +14,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 
   <!-- Bump ?v=N when you push CSS/JS changes to bust the browser cache -->
-  <link rel="stylesheet" href="style.css?v=2" />
+  <link rel="stylesheet" href="style.css?v=3" />
 
   <!-- Apply saved theme before paint to avoid flash -->
   <script>
@@ -110,10 +110,12 @@
         </ul>
       </div>
 
-      <!-- IMAGE PLACEHOLDER: replace with hero photo -->
       <div class="hero-art" role="img" aria-label="Coffee cup on saucer">
         <div class="placeholder-img hero-placeholder">
-          <span>Hero Image Placeholder</span>
+          <img src="https://loremflickr.com/900/900/coffee,latte,art?lock=1"
+               alt="Latte art in a ceramic cup" loading="eager"
+               onerror="this.style.display='none'">
+          <span class="ph-fallback">Hero Image</span>
         </div>
         <div class="hero-floater floater-1">🌿</div>
         <div class="hero-floater floater-2">🌸</div>
@@ -146,7 +148,12 @@
 
     <div class="featured-grid">
       <article class="promo-card">
-        <div class="placeholder-img promo-img"><span>Promo Image</span></div>
+        <div class="placeholder-img promo-img">
+          <img src="https://loremflickr.com/600/420/latte,pink,rose?lock=10"
+               alt="Pink rose latte" loading="lazy"
+               onerror="this.style.display='none'">
+          <span class="ph-fallback">Promo</span>
+        </div>
         <div class="promo-body">
           <h3>Pink Rose Latte</h3>
           <p>Rose-infused espresso with steamed oat milk.</p>
@@ -154,7 +161,12 @@
         </div>
       </article>
       <article class="promo-card">
-        <div class="placeholder-img promo-img"><span>Promo Image</span></div>
+        <div class="placeholder-img promo-img">
+          <img src="https://loremflickr.com/600/420/matcha,latte?lock=11"
+               alt="Matcha latte with foam" loading="lazy"
+               onerror="this.style.display='none'">
+          <span class="ph-fallback">Promo</span>
+        </div>
         <div class="promo-body">
           <h3>Matcha Bloom</h3>
           <p>Ceremonial matcha layered over vanilla cream.</p>
@@ -162,7 +174,12 @@
         </div>
       </article>
       <article class="promo-card">
-        <div class="placeholder-img promo-img"><span>Promo Image</span></div>
+        <div class="placeholder-img promo-img">
+          <img src="https://loremflickr.com/600/420/coffee,pastry,cafe?lock=12"
+               alt="Coffee and pastry bundle" loading="lazy"
+               onerror="this.style.display='none'">
+          <span class="ph-fallback">Promo</span>
+        </div>
         <div class="promo-body">
           <h3>Barista's Bundle</h3>
           <p>Any 2 drinks + 1 pastry — save up to ₱90.</p>
@@ -191,8 +208,12 @@
        ========================================================== -->
   <section class="about" id="about">
     <div class="container about-grid">
-      <!-- IMAGE PLACEHOLDER: replace with shop photo -->
-      <div class="placeholder-img about-img"><span>About Image</span></div>
+      <div class="placeholder-img about-img">
+        <img src="https://loremflickr.com/700/700/cafe,coffeeshop,interior?lock=20"
+             alt="Cozy cafe interior" loading="lazy"
+             onerror="this.style.display='none'">
+        <span class="ph-fallback">About</span>
+      </div>
       <div class="about-copy">
         <p class="eyebrow">Our story</p>
         <h2>Small batch. Big heart.</h2>
@@ -433,7 +454,9 @@
       <div class="customizer-body" id="customizerBody">
         <!-- Hero strip -->
         <div class="cz-hero">
-          <div class="placeholder-img cz-img" id="czImage" aria-hidden="true"><span></span></div>
+          <div class="placeholder-img cz-img" id="czImage" aria-hidden="true">
+            <!-- contents replaced by JS when item opens -->
+          </div>
           <div class="cz-hero-text">
             <p class="eyebrow" id="czCategory">Coffee</p>
             <h4 id="czName">Item name</h4>
@@ -502,6 +525,6 @@
        ========================================================== -->
   <div class="toast" id="toast" aria-live="polite"></div>
 
-  <script src="script.js?v=2"></script>
+  <script src="script.js?v=3"></script>
 </body>
 </html>

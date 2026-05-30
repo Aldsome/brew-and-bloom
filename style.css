@@ -340,13 +340,17 @@ button { font-family: inherit; cursor: pointer; }
 }
 
 /* ==========================================================
-   IMAGE PLACEHOLDERS  (swap for real <img> tags later)
+   IMAGE PLACEHOLDERS
+   - Real <img> sits inside .placeholder-img and fills the box.
+   - The gradient + .ph-fallback text shows ONLY if the image
+     fails to load (img is hidden via onerror inline handler).
    ========================================================== */
 .placeholder-img {
+  position: relative;
   display: grid;
   place-items: center;
-  background:
-    linear-gradient(135deg, var(--green-100), var(--pink-100));
+  overflow: hidden;
+  background: linear-gradient(135deg, var(--green-100), var(--pink-100));
   color: var(--primary-deep);
   font-weight: 600;
   font-size: .9rem;
@@ -355,9 +359,23 @@ button { font-family: inherit; cursor: pointer; }
   border: 1px dashed rgba(58, 110, 59, 0.25);
   min-height: 180px;
   text-align: center;
+  padding: 0;
+  isolation: isolate;
+}
+.placeholder-img > img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border-radius: inherit;
+  z-index: 1;
+}
+.placeholder-img .ph-fallback {
+  opacity: .85;
   padding: 16px;
 }
-.placeholder-img span { opacity: .8; }
 
 /* ==========================================================
    CATEGORY CHIPS
@@ -983,12 +1001,25 @@ button { font-family: inherit; cursor: pointer; }
   align-items: center;
 }
 .cart-item .ph {
+  position: relative;
   width: 56px; height: 56px;
   border-radius: 12px;
   background: linear-gradient(135deg, var(--green-100), var(--pink-100));
   display: grid;
   place-items: center;
   font-size: 1.4rem;
+  overflow: hidden;
+}
+.cart-item .ph img {
+  position: absolute;
+  inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.cart-item .ph .ph-fallback {
+  position: relative;
+  z-index: 0;
 }
 .cart-item .title { font-weight: 600; font-size: .96rem; }
 .cart-item .qty-row {
