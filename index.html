@@ -14,7 +14,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 
   <!-- Bump ?v=N when you push CSS/JS changes to bust the browser cache -->
-  <link rel="stylesheet" href="style.css?v=3" />
+  <link rel="stylesheet" href="style.css?v=4" />
 
   <!-- Apply saved theme before paint to avoid flash -->
   <script>
@@ -146,47 +146,10 @@
       <p>Hand-picked drinks our baristas can't stop making.</p>
     </div>
 
-    <div class="featured-grid">
-      <article class="promo-card">
-        <div class="placeholder-img promo-img">
-          <img src="https://loremflickr.com/600/420/latte,pink,rose?lock=10"
-               alt="Pink rose latte" loading="lazy"
-               onerror="this.style.display='none'">
-          <span class="ph-fallback">Promo</span>
-        </div>
-        <div class="promo-body">
-          <h3>Pink Rose Latte</h3>
-          <p>Rose-infused espresso with steamed oat milk.</p>
-          <a href="#menu" class="link-arrow">Try it →</a>
-        </div>
-      </article>
-      <article class="promo-card">
-        <div class="placeholder-img promo-img">
-          <img src="https://loremflickr.com/600/420/matcha,latte?lock=11"
-               alt="Matcha latte with foam" loading="lazy"
-               onerror="this.style.display='none'">
-          <span class="ph-fallback">Promo</span>
-        </div>
-        <div class="promo-body">
-          <h3>Matcha Bloom</h3>
-          <p>Ceremonial matcha layered over vanilla cream.</p>
-          <a href="#menu" class="link-arrow">Try it →</a>
-        </div>
-      </article>
-      <article class="promo-card">
-        <div class="placeholder-img promo-img">
-          <img src="https://loremflickr.com/600/420/coffee,pastry,cafe?lock=12"
-               alt="Coffee and pastry bundle" loading="lazy"
-               onerror="this.style.display='none'">
-          <span class="ph-fallback">Promo</span>
-        </div>
-        <div class="promo-body">
-          <h3>Barista's Bundle</h3>
-          <p>Any 2 drinks + 1 pastry — save up to ₱90.</p>
-          <a href="#menu" class="link-arrow">Build yours →</a>
-        </div>
-      </article>
-    </div>
+    <!-- Cards are rendered by script.js from MENU + FEATURED_IDS,
+         so any change to a menu item (image, name, desc) flows
+         through here automatically. -->
+    <div class="featured-grid" id="featuredGrid"></div>
   </section>
 
   <!-- ==========================================================
@@ -525,6 +488,6 @@
        ========================================================== -->
   <div class="toast" id="toast" aria-live="polite"></div>
 
-  <script src="script.js?v=3"></script>
+  <script src="script.js?v=4"></script>
 </body>
 </html>

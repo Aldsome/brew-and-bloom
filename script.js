@@ -130,6 +130,20 @@ const FREE_DELIVERY_THRESHOLD = 500;
 const CURRENCY = '₱';
 
 /* ==========================================================
+   FEATURED ITEMS
+   - IDs reference MENU entries. Change/reorder to pick what
+     appears in the "Featured Today" section. The card pulls
+     image, name, and description from MENU automatically.
+   - cta:    optional override for the link text
+   - blurb:  optional override for the description
+   ========================================================== */
+const FEATURED = [
+  { id: 'c3' },                                                    // Pink Rose Latte
+  { id: 't1' },                                                    // Matcha Bloom
+  { id: 'd1', cta: 'Build yours →', blurb: 'Any 2 drinks + 1 pastry — save up to ₱90.' },
+];
+
+/* ==========================================================
    STATE
    - cart is an array of "lines". Each line = { id, lineKey,
      qty, config }. lineKey is a hash of item id + config so
@@ -245,6 +259,37 @@ function configSummary(item, config) {
   }
   if (config.notes) bits.push(`“${config.notes}”`);
   return bits.join(' • ');
+}
+
+/* ==========================================================
+   FEATURED RENDERING
+   - Source of truth = MENU. Listed by id in FEATURED above.
+   - Clicking the card opens the same customizer as the menu,
+     so the "Try it →" link is a real action.
+   ========================================================== */
+function renderFeatured() {
+  const host = $('#featuredGrid');
+  if (!host) return;
+  host.innerHTML = FEATURED.map(f => {
+    const item = MENU.find(m => m.id === f.id);
+    if (!item) return '';
+    const blurb = f.blurb || item.desc;
+    const cta   = f.cta   || 'Try it →';
+    return `
+      <article class="promo-card" data-id="${item.id}">
+        <div class="placeholder-img promo-img">
+          <img src="${item.img}" alt="${item.name}" loading="lazy"
+               onerror="this.style.display='none'">
+          <span class="ph-fallback">${item.emoji}</span>
+        </div>
+        <div class="promo-body">
+          <h3>${item.name}</h3>
+          <p>${blurb}</p>
+          <button type="button" class="link-arrow" data-open="${item.id}">${cta}</button>
+        </div>
+      </article>
+    `;
+  }).join('');
 }
 
 /* ==========================================================
@@ -725,6 +770,15 @@ function bindEvents() {
     if (id) openCustomizer(id, { sourceEl: e.target });
   });
 
+  // Featured cards — "Try it →" buttons open the same customizer
+  const featuredHost = $('#featuredGrid');
+  if (featuredHost) {
+    featuredHost.addEventListener('click', (e) => {
+      const id = e.target.dataset.open;
+      if (id) openCustomizer(id, { sourceEl: e.target });
+    });
+  }
+
   // Cart drawer controls
   $('#openCartBtn').addEventListener('click', openCart);
   $('#closeCartBtn').addEventListener('click', closeCart);
@@ -826,6 +880,7 @@ function bindEvents() {
    ========================================================== */
 document.addEventListener('DOMContentLoaded', () => {
   initTheme();
+  renderFeatured();
   renderMenu();
   updateCart();
   bindEvents();
