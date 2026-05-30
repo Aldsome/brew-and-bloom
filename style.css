@@ -684,14 +684,37 @@ button { font-family: inherit; cursor: pointer; }
   border-radius: 10px;
   border: 1px solid var(--line);
   background: var(--cream);
+  color: var(--ink);
   font-family: inherit;
   font-size: .95rem;
   resize: vertical;
 }
+#czNotes::placeholder { color: var(--ink-soft); }
 #czNotes:focus {
   outline: none;
   border-color: var(--primary);
   background: var(--white);
+}
+
+/* ==========================================================
+   AUTOFILL OVERRIDE
+   - Browsers (esp. Chrome) repaint autofilled inputs with
+     their own background + dark text, which breaks contrast
+     in dark mode. Force our token colors instead.
+   ========================================================== */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill {
+  -webkit-text-fill-color: var(--ink) !important;
+  -webkit-box-shadow: 0 0 0 1000px var(--cream) inset !important;
+  caret-color: var(--ink);
+  transition: background-color 9999s ease-in-out 0s;
+}
+[data-theme="dark"] input:-webkit-autofill,
+[data-theme="dark"] textarea:-webkit-autofill {
+  -webkit-text-fill-color: #ECF1EE !important;
+  -webkit-box-shadow: 0 0 0 1000px #1F2A26 inset !important;
 }
 
 .cz-footer {
@@ -919,37 +942,50 @@ button { font-family: inherit; cursor: pointer; }
   color: var(--white);
   font-family: var(--font-body);
   font-weight: 600;
-  margin-bottom: 12px;
+  font-size: 1.05rem;
+  margin-bottom: 14px;
+  letter-spacing: .01em;
 }
-.site-footer .muted { color: #9BABA1; }
+.site-footer p { margin-bottom: 6px; }
+.site-footer .muted { color: #B6C2BB; }
 .footer-grid {
   display: grid;
   grid-template-columns: 1.4fr 1fr 1fr 1.4fr;
   gap: 32px;
 }
+.footer-brand { margin-bottom: 14px; }
 .footer-brand .brand-name { color: var(--white); }
 .newsletter {
   display: flex;
   gap: 8px;
-  margin-top: 8px;
+  margin-top: 10px;
 }
 .newsletter input {
   flex: 1;
-  padding: 12px 14px;
+  padding: 12px 16px;
   border-radius: 999px;
-  border: 1px solid #2E3A33;
+  border: 1px solid #4A5A52;
   background: #2A332E;
   color: var(--white);
+  -webkit-text-fill-color: var(--white);
   font-family: inherit;
+  font-size: .92rem;
+  transition: border-color .2s ease, background .2s ease;
 }
-.newsletter input::placeholder { color: #8A968F; }
+.newsletter input:focus {
+  outline: none;
+  border-color: var(--green-300);
+  background: #34403A;
+}
+.newsletter input::placeholder { color: #B6C2BB; opacity: .85; }
+.newsletter .btn-primary { padding: .7em 1.4em; }
 .footer-base {
   text-align: center;
   margin-top: 40px;
   padding-top: 20px;
   border-top: 1px solid #2A332E;
   font-size: .85rem;
-  color: #8A968F;
+  color: #9BABA1;
 }
 
 /* ==========================================================
@@ -1286,16 +1322,53 @@ button { font-family: inherit; cursor: pointer; }
     var(--bg);
 }
 [data-theme="dark"] .about { background: #131A1B; }
-[data-theme="dark"] .site-footer { background: #0B0F10; color: #B6C2BB; }
-[data-theme="dark"] .site-footer .muted { color: #7B8A83; }
+[data-theme="dark"] .site-footer { background: #0B0F10; color: #C8D3CC; }
+[data-theme="dark"] .site-footer .muted { color: #A8B4AC; }
 [data-theme="dark"] .newsletter input {
-  background: #1B2225;
-  border-color: #2B3331;
-  color: var(--white);
+  background: #1F2A26;
+  border-color: #3A4A40;
+  color: #ECF1EE;
+  -webkit-text-fill-color: #ECF1EE;
 }
-[data-theme="dark"] .footer-base { border-top-color: #1F2627; color: #7B8A83; }
-[data-theme="dark"] .chip { background: var(--surface); color: var(--ink); }
-[data-theme="dark"] .chip.active { color: #0F1416; }
+[data-theme="dark"] .newsletter input:focus {
+  border-color: var(--primary);
+  background: #263530;
+}
+[data-theme="dark"] .newsletter input::placeholder { color: #8FA095; opacity: .9; }
+
+/* ----- Dark-mode text-color fixes -----
+   Several rules use `color: var(--white)` for legible white text
+   on a colored background. In dark mode --white becomes a dark
+   surface, so we restore a light text color in those spots. */
+[data-theme="dark"] .site-footer h4,
+[data-theme="dark"] .footer-brand .brand-name {
+  color: #ECF1EE;
+}
+[data-theme="dark"] .brand-mark {
+  color: #ECF1EE;
+}
+
+/* Force light text on form controls in dark mode — beats
+   Chrome's autofill -webkit-text-fill-color even on inputs
+   that aren't currently in :-webkit-autofill state. */
+[data-theme="dark"] .checkout-form input,
+[data-theme="dark"] .checkout-form textarea,
+[data-theme="dark"] #czNotes {
+  color: #ECF1EE;
+  -webkit-text-fill-color: #ECF1EE;
+}
+[data-theme="dark"] .footer-base { border-top-color: #1F2627; color: #95A39B; }
+[data-theme="dark"] .chip {
+  background: var(--surface);
+  color: var(--ink);
+  border-color: #2E3A33;
+}
+[data-theme="dark"] .chip.active {
+  background: #2E5A45;          /* darker green so light text reads */
+  color: #ECF1EE;
+  border-color: #4F8265;
+}
+[data-theme="dark"] .chip:hover { border-color: var(--green-300); }
 [data-theme="dark"] .drawer-foot { background: var(--surface); }
 [data-theme="dark"] .modal { background: rgba(0, 0, 0, 0.7); }
 [data-theme="dark"] .modal-card,
@@ -1313,6 +1386,56 @@ button { font-family: inherit; cursor: pointer; }
 [data-theme="dark"] .add-btn { background: var(--pink-100); color: var(--pink-700); }
 [data-theme="dark"] .add-btn:hover { background: var(--accent); color: #0F1416; }
 [data-theme="dark"] .btn-primary { color: #0F1416; }
+
+/* ==========================================================
+   GLOBAL FORM CONTROL TEXT — DARK MODE
+   - One source of truth: every typeable element gets light
+     text in dark mode. Wins over Chrome's autofill, browser
+     defaults, theme extensions, and any inherited color.
+   - Catches: <input> (every text-like type), <textarea>,
+     <select>, anything with contenteditable, and any custom
+     ".text-input" class you might add later.
+   - Opt-outs: checkbox, radio, color, range, file, button-like
+     inputs, and .btn (these don't render typed text or are
+     already correctly themed).
+   ========================================================== */
+html[data-theme="dark"] input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]):not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="image"]):not(.btn),
+html[data-theme="dark"] textarea,
+html[data-theme="dark"] select,
+html[data-theme="dark"] [contenteditable="true"],
+html[data-theme="dark"] [contenteditable=""],
+html[data-theme="dark"] .text-input {
+  color: #ECF1EE !important;
+  -webkit-text-fill-color: #ECF1EE !important;
+  caret-color: #ECF1EE !important;
+}
+
+/* Placeholders — same scope */
+html[data-theme="dark"] input::placeholder,
+html[data-theme="dark"] textarea::placeholder,
+html[data-theme="dark"] [contenteditable][data-placeholder]::before {
+  color: #8FA095 !important;
+  -webkit-text-fill-color: #8FA095 !important;
+  opacity: 1 !important;
+}
+
+/* Drag-selection highlight — page-wide (not just inputs),
+   so any selected text in dark mode stays legible. */
+html[data-theme="dark"] ::selection {
+  background: var(--primary);
+  color: #0F1416;
+  -webkit-text-fill-color: #0F1416;
+}
+
+/* Native UI bits browsers render inside inputs:
+   spinner arrows on number inputs, the "x" clear button on
+   search inputs, the calendar icon on date pickers, etc. */
+html[data-theme="dark"] input::-webkit-calendar-picker-indicator,
+html[data-theme="dark"] input::-webkit-search-cancel-button,
+html[data-theme="dark"] input::-webkit-inner-spin-button,
+html[data-theme="dark"] input::-webkit-outer-spin-button {
+  filter: invert(.85);
+}
 
 /* ==========================================================
    RESPONSIVE — TABLET (≤ 1024px)
