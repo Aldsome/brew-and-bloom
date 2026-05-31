@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin · Brew & Bloom</title>
+  <meta name="robots" content="noindex, nofollow" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="admin.css?v=5" />
+
+  <script>
+    (function () {
+      try {
+        var saved = localStorage.getItem('bb-theme');
+        var theme = (saved === 'dark' || saved === 'light')
+          ? saved
+          : (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (e) {}
+    })();
+  </script>
+</head>
+<body>
+
+  <!-- ==========================================================
+       AUTH GATE  (login + register tabs; covers everything else
+       until the user has a valid session)
+       ========================================================== -->
+  <div class="auth-gate" id="authGate">
+    <div class="auth-card">
+      <div class="auth-brand">
+        <span class="brand-mark">B&amp;B</span>
+        <div>
+          <h1>Brew &amp; Bloom</h1>
+          <p class="muted">Admin Console</p>
+        </div>
+      </div>
+
+      <div class="auth-tabs" role="tablist">
+        <button class="auth-tab active" data-auth-tab="login" role="tab">Sign in</button>
+        <button class="auth-tab"        data-auth-tab="register" role="tab">Create account</button>
+      </div>
+
+      <!-- Stacked forms: both occupy the same cell. CSS crossfades
+           via .active so the card never jumps in height. -->
+      <div class="auth-form-stack">
+        <!-- Login form -->
+        <form class="auth-form active" id="loginForm" autocomplete="on">
+          <label>
+            Email
+            <input type="email" name="email" required autocomplete="username" placeholder="you@example.com" />
+          </label>
+          <label>
+            Password
+            <div class="pw-wrap">
+              <input type="password" name="password" required autocomplete="current-password" minlength="8" />
+              <button type="button" class="pw-toggle" aria-label="Show password">👁</button>
+            </div>
+          </label>
+          <p class="form-error" id="loginError" hidden></p>
+          <button type="submit" class="btn btn-primary btn-block">Sign in</button>
+          <p class="hint muted">
+            First time? Default admin: <code>admin@admin.com</code> / <code>admin1234</code>
+          </p>
+        </form>
+
+        <!-- Register form -->
+        <form class="auth-form" id="registerForm" autocomplete="on">
+          <label>
+            Name
+            <input type="text" name="name" required placeholder="Your name" />
+          </label>
+          <label>
+            Email
+            <input type="email" name="email" required autocomplete="username" placeholder="you@example.com" />
+          </label>
+          <label>
+            Password
+            <input type="password" name="password" required autocomplete="new-password" minlength="8" />
+            <small class="muted">8+ characters. Use a unique one — passwords are hashed but stored locally for now.</small>
+          </label>
+          <p class="form-error" id="registerError" hidden></p>
+          <button type="submit" class="btn btn-primary btn-block">Create account</button>
+          <p class="hint muted">
+            New accounts default to "customer." Ask an existing admin to promote you.
+          </p>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================
+       ADMIN APP SHELL  (shown only after login)
+       ========================================================== -->
+  <div class="app" id="adminApp" hidden>
+
+    <!-- Top bar -->
+    <header class="topbar">
+      <button class="icon-btn sidebar-toggle" id="sidebarToggle" aria-label="Menu">☰</button>
+      <div class="topbar-brand">
+        <span class="brand-mark sm">B&amp;B</span>
+        <strong>Admin</strong>
+      </div>
+
+      <div class="topbar-right">
+        <a href="index.html" class="link" target="_blank" rel="noopener">View public site ↗</a>
+        <button class="icon-btn theme-toggle" id="themeToggleBtn" aria-label="Toggle theme">
+          <span class="sun">☀</span><span class="moon">☾</span>
+        </button>
+        <div class="user-chip" id="userChip">
+          <span class="avatar" id="userAvatar">A</span>
+          <span class="user-name" id="userName">Admin</span>
+          <button class="link logout-btn" id="logoutBtn">Sign out</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <nav class="side-nav" aria-label="Admin sections">
+        <button class="side-link active" data-section="dashboard">
+          <span class="ico">▣</span> Dashboard
+        </button>
+        <button class="side-link" data-section="menu">
+          <span class="ico">☕</span> Menu Items
+        </button>
+        <button class="side-link" data-section="content">
+          <span class="ico">✎</span> Banner &amp; Content
+        </button>
+        <button class="side-link admin-only" data-section="payments">
+          <span class="ico">$</span> Payments &amp; API
+        </button>
+        <button class="side-link admin-only" data-section="users">
+          <span class="ico">⚇</span> Users
+        </button>
+        <button class="side-link" data-section="danger">
+          <span class="ico">⚠</span> Danger Zone
+        </button>
+      </nav>
+      <footer class="sidebar-footer">
+        <p class="muted small">Brew &amp; Bloom Admin · v0.1 prototype</p>
+      </footer>
+    </aside>
+
+    <!-- Main content -->
+    <main class="content" id="content">
+
+      <!-- ============ DASHBOARD ============ -->
+      <section class="panel" data-panel="dashboard">
+        <header class="panel-head">
+          <div>
+            <h2>Dashboard</h2>
+            <p class="muted">Quick overview of what's live on your store.</p>
+          </div>
+        </header>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <p class="stat-label">Menu items</p>
+            <h3 id="statMenu">—</h3>
+          </div>
+          <div class="stat-card">
+            <p class="stat-label">Categories</p>
+            <h3 id="statCategories">—</h3>
+          </div>
+          <div class="stat-card">
+            <p class="stat-label">Payment methods enabled</p>
+            <h3 id="statPayments">—</h3>
+          </div>
+          <div class="stat-card">
+            <p class="stat-label">Registered users</p>
+            <h3 id="statUsers">—</h3>
+          </div>
+        </div>
+
+        <div class="info-box">
+          <h4>Prototype status</h4>
+          <p>This admin panel currently writes to your browser's <code>localStorage</code>. Changes are visible only on this device. See <code>BUGS.md</code> for the production upgrade path (Supabase / Firebase).</p>
+        </div>
+      </section>
+
+      <!-- ============ MENU ============ -->
+      <section class="panel" data-panel="menu" hidden>
+        <header class="panel-head">
+          <div>
+            <h2>Menu Items</h2>
+            <p class="muted">Add, edit, or remove drinks and pastries.</p>
+          </div>
+          <button class="btn btn-primary" id="addItemBtn">+ Add item</button>
+        </header>
+
+        <div class="toolbar">
+          <input type="search" id="menuSearch" placeholder="Search by name or category…" />
+          <select id="menuCategoryFilter">
+            <option value="">All categories</option>
+            <option value="coffee">Coffee</option>
+            <option value="tea">Tea</option>
+            <option value="cold">Cold Brews</option>
+            <option value="pastry">Pastries</option>
+            <option value="bundle">Bundles</option>
+          </select>
+        </div>
+
+        <div class="table-wrap">
+          <table class="data-table" id="menuTable">
+            <thead>
+              <tr>
+                <th></th>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Tag</th>
+                <th>Options</th>
+                <th class="right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="menuTableBody">
+              <!-- rows injected by admin.js -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ============ BANNER & CONTENT ============ -->
+      <section class="panel" data-panel="content" hidden>
+        <header class="panel-head">
+          <div>
+            <h2>Banner &amp; Content</h2>
+            <p class="muted">Edit the customer-facing text and the hero / about images.</p>
+          </div>
+          <button class="btn btn-primary" id="saveContentBtn">Save changes</button>
+        </header>
+
+        <form class="content-form" id="contentForm">
+          <fieldset>
+            <legend>Brand</legend>
+            <label>Brand name <input type="text" name="brandName" /></label>
+            <label>Tagline <textarea name="brandTagline" rows="2"></textarea></label>
+            <label>Announcement bar <input type="text" name="announcement" placeholder="Free delivery on orders over ₱500" /></label>
+          </fieldset>
+
+          <fieldset>
+            <legend>Hero section</legend>
+            <label>Eyebrow text <input type="text" name="heroEyebrow" /></label>
+            <label>Headline (newlines allowed) <textarea name="heroTitle" rows="3"></textarea></label>
+            <label>Hero image
+              <div class="img-uploader" data-img-target="heroImage">
+                <img class="preview" id="heroImagePreview" alt="" />
+                <input type="url" name="heroImage" placeholder="https://… or upload" />
+                <input type="file" accept="image/*" class="img-file" data-target="heroImage" />
+                <button type="button" class="btn btn-ghost choose-file">Upload image</button>
+              </div>
+            </label>
+          </fieldset>
+
+          <fieldset>
+            <legend>About section</legend>
+            <label>About title <input type="text" name="aboutTitle" /></label>
+            <label>About body <textarea name="aboutBody" rows="4"></textarea></label>
+            <label>About image
+              <div class="img-uploader" data-img-target="aboutImage">
+                <img class="preview" id="aboutImagePreview" alt="" />
+                <input type="url" name="aboutImage" placeholder="https://… or upload" />
+                <input type="file" accept="image/*" class="img-file" data-target="aboutImage" />
+                <button type="button" class="btn btn-ghost choose-file">Upload image</button>
+              </div>
+            </label>
+          </fieldset>
+
+          <fieldset>
+            <legend>Contact</legend>
+            <label>Phone <input type="tel" name="contactPhone" /></label>
+            <label>Email <input type="email" name="contactEmail" /></label>
+            <label>Address <input type="text" name="contactAddress" /></label>
+            <label>Hours <input type="text" name="hours" /></label>
+          </fieldset>
+        </form>
+      </section>
+
+      <!-- ============ PAYMENTS & API (admin only) ============ -->
+      <section class="panel admin-only" data-panel="payments" hidden>
+        <header class="panel-head">
+          <div>
+            <h2>Payments &amp; API</h2>
+            <p class="muted">Toggle methods and configure provider keys. Customers never see these values.</p>
+          </div>
+          <button class="btn btn-primary" id="savePaymentsBtn">Save changes</button>
+        </header>
+
+        <div class="warn-box">
+          <strong>⚠ Security notice.</strong> API keys are stored in localStorage in this prototype, which is INSECURE.
+          Real keys must live on a backend server, never in a browser. Use the placeholders below for now.
+        </div>
+
+        <form class="payments-form" id="paymentsForm">
+          <!-- GCash -->
+          <fieldset>
+            <legend>GCash</legend>
+            <label class="toggle"><input type="checkbox" data-pay="gcash" data-field="enabled" /> Enabled for customers</label>
+            <label>API key <input type="password" data-pay="gcash" data-field="apiKey" placeholder="xnd_pk_…" /></label>
+            <label>Merchant ID <input type="text" data-pay="gcash" data-field="merchantId" /></label>
+          </fieldset>
+
+          <!-- Maya -->
+          <fieldset>
+            <legend>Maya</legend>
+            <label class="toggle"><input type="checkbox" data-pay="maya" data-field="enabled" /> Enabled for customers</label>
+            <label>API key <input type="password" data-pay="maya" data-field="apiKey" /></label>
+            <label>Merchant ID <input type="text" data-pay="maya" data-field="merchantId" /></label>
+          </fieldset>
+
+          <!-- Bank -->
+          <fieldset>
+            <legend>Online Banking (BPI / BDO / UnionBank…)</legend>
+            <label class="toggle"><input type="checkbox" data-pay="bank" data-field="enabled" /> Enabled for customers</label>
+            <label>Provider
+              <select data-pay="bank" data-field="provider">
+                <option value="paymongo">PayMongo</option>
+                <option value="xendit">Xendit</option>
+              </select>
+            </label>
+            <label>API key <input type="password" data-pay="bank" data-field="apiKey" /></label>
+          </fieldset>
+
+          <!-- Card -->
+          <fieldset>
+            <legend>Credit / Debit Card</legend>
+            <label class="toggle"><input type="checkbox" data-pay="card" data-field="enabled" /> Enabled for customers</label>
+            <label>Provider
+              <select data-pay="card" data-field="provider">
+                <option value="stripe">Stripe</option>
+                <option value="paymongo">PayMongo</option>
+                <option value="adyen">Adyen</option>
+              </select>
+            </label>
+            <label>Publishable key <input type="text"     data-pay="card" data-field="publishableKey" placeholder="pk_test_…" /></label>
+            <label>Secret key      <input type="password" data-pay="card" data-field="secretKey"      placeholder="sk_test_…" /></label>
+          </fieldset>
+
+          <!-- COD -->
+          <fieldset>
+            <legend>Cash on Delivery</legend>
+            <label class="toggle"><input type="checkbox" data-pay="cod" data-field="enabled" /> Enabled for customers</label>
+          </fieldset>
+        </form>
+      </section>
+
+      <!-- ============ USERS (admin only) ============ -->
+      <section class="panel admin-only" data-panel="users" hidden>
+        <header class="panel-head">
+          <div>
+            <h2>Users</h2>
+            <p class="muted">Promote customers to admin or demote them back.</p>
+          </div>
+        </header>
+
+        <div class="table-wrap">
+          <table class="data-table" id="usersTable">
+            <thead>
+              <tr><th>Name</th><th>Email</th><th>Role</th><th>Joined</th><th class="right">Actions</th></tr>
+            </thead>
+            <tbody id="usersTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ============ DANGER ZONE ============ -->
+      <section class="panel" data-panel="danger" hidden>
+        <header class="panel-head">
+          <div>
+            <h2>Danger Zone</h2>
+            <p class="muted">Destructive actions. There is no undo.</p>
+          </div>
+        </header>
+
+        <div class="danger-card">
+          <h4>Reset menu to factory defaults</h4>
+          <p class="muted">Reverts all menu items to the original 16. Custom items will be deleted.</p>
+          <button class="btn btn-danger" id="resetMenuBtn">Reset menu</button>
+        </div>
+
+        <div class="danger-card">
+          <h4>Reset content to factory defaults</h4>
+          <p class="muted">Reverts brand name, hero text, about, and contact details.</p>
+          <button class="btn btn-danger" id="resetContentBtn">Reset content</button>
+        </div>
+
+        <div class="danger-card">
+          <h4>Factory reset everything</h4>
+          <p class="muted">Wipes all admin data on this device — menu, content, payments, AND user accounts (you'll be signed out).</p>
+          <button class="btn btn-danger" id="factoryResetBtn">Factory reset</button>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ============ ITEM EDIT MODAL ============ -->
+  <div class="modal" id="itemModal" aria-hidden="true">
+    <div class="modal-card">
+      <header class="modal-head">
+        <h3 id="itemModalTitle">Edit item</h3>
+        <button class="icon-btn close-btn" id="closeItemModal" aria-label="Close">✕</button>
+      </header>
+      <form id="itemForm" class="content-form">
+        <div class="grid-2">
+          <label>ID <small class="muted">(unique slug, no spaces)</small>
+            <input type="text" name="id" required pattern="[a-z0-9_-]+" />
+          </label>
+          <label>Name
+            <input type="text" name="name" required />
+          </label>
+        </div>
+        <div class="grid-2">
+          <label>Category
+            <select name="category" required>
+              <option value="coffee">Coffee</option>
+              <option value="tea">Tea</option>
+              <option value="cold">Cold Brews</option>
+              <option value="pastry">Pastries</option>
+              <option value="bundle">Bundles</option>
+            </select>
+          </label>
+          <label>Price (₱)
+            <input type="number" name="price" required min="0" step="1" />
+          </label>
+        </div>
+        <div class="grid-2">
+          <label>Emoji
+            <input type="text" name="emoji" maxlength="4" placeholder="☕" />
+          </label>
+          <label>Rating
+            <input type="number" name="rating" min="0" max="5" step="0.1" />
+          </label>
+        </div>
+        <label>Tag (optional)
+          <input type="text" name="tag" placeholder="New / Bestseller / Save" />
+        </label>
+        <label>Description
+          <textarea name="desc" rows="2" required></textarea>
+        </label>
+
+        <label>Image
+          <div class="img-uploader" data-img-target="itemImage">
+            <img class="preview" id="itemImagePreview" alt="" />
+            <input type="url" name="img" placeholder="https://… or upload" />
+            <input type="file" accept="image/*" class="img-file" data-target="itemImage" />
+            <button type="button" class="btn btn-ghost choose-file">Upload image</button>
+          </div>
+        </label>
+
+        <fieldset>
+          <legend>Customer can choose…</legend>
+          <div class="check-row">
+            <label><input type="checkbox" name="opt_size" /> Size</label>
+            <label><input type="checkbox" name="opt_temp" /> Hot/Iced</label>
+            <label><input type="checkbox" name="opt_milk" /> Milk type</label>
+            <label><input type="checkbox" name="opt_sugar" /> Sugar level</label>
+            <label><input type="checkbox" name="opt_addons" /> Add-ons</label>
+          </div>
+        </fieldset>
+
+        <p class="form-error" id="itemFormError" hidden></p>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn-ghost" id="cancelItemBtn">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="saveItemBtn">Save item</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast" aria-live="polite"></div>
+
+  <script src="store.js?v=3"></script>
+  <script src="admin.js?v=2"></script>
+</body>
+</html>

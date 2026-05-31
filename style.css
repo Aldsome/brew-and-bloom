@@ -4,27 +4,30 @@
    ========================================================== */
 
 /* ==========================================================
-   COLORS  (soft green + pink palette — change here)
+   COLORS  (soft pastel brown + yellow + white — change here)
+   - "green-*" tokens kept their NAMES for cascade simplicity
+     but now hold SOFT BROWN ramps (primary).
+   - "pink-*" tokens now hold SOFT YELLOW ramps (accent).
    ========================================================== */
 :root {
-  --green-50:  #F2F8F1;
-  --green-100: #DCEBD8;
-  --green-200: #B7D6AF;
-  --green-300: #8FBE84;
-  --green-500: #5C9A56;   /* primary green */
-  --green-700: #3A6E3B;   /* deep accent green */
+  --green-50:  #FAF6F1;    /* almost-white cream */
+  --green-100: #F0E5D5;    /* light beige */
+  --green-200: #DDC9A8;    /* warm sand */
+  --green-300: #C8AC81;    /* milk coffee */
+  --green-500: #A0855E;    /* primary brown */
+  --green-700: #6F5A3E;    /* deep espresso */
 
-  --pink-50:   #FCF3F2;
-  --pink-100: #FBE3E3;
-  --pink-200: #F7C8CC;
-  --pink-300: #F2A6AE;
-  --pink-500: #E58A93;    /* primary pink */
-  --pink-700: #C16670;    /* deep accent pink */
+  --pink-50:   #FFFBEF;    /* butter cream */
+  --pink-100: #FFF1C8;     /* soft butter */
+  --pink-200: #FFE48A;     /* pastel yellow */
+  --pink-300: #FFD865;     /* warm yellow */
+  --pink-500: #F0BB3D;     /* accent yellow */
+  --pink-700: #C18F1E;     /* deep amber */
 
-  --cream:     #FFF9F4;
-  --ink:       #1F2A24;   /* primary text */
-  --ink-soft:  #5A6660;   /* secondary text */
-  --line:      #E6ECE5;   /* borders / dividers */
+  --cream:     #FFFDF8;    /* warm white background */
+  --ink:       #3D2E1F;    /* deep coffee brown text */
+  --ink-soft:  #6B5847;    /* mid mocha text */
+  --line:      #F0E5D5;    /* warm beige borders */
   --white:     #FFFFFF;
 
   /* Semantic */
@@ -463,19 +466,71 @@ button { font-family: inherit; cursor: pointer; }
   gap: 22px;
 }
 .product-card {
+  position: relative;
   background: var(--surface);
   border-radius: var(--radius);
   padding: 16px;
   display: flex;
   flex-direction: column;
   box-shadow: var(--shadow-sm);
-  transition: transform .2s ease, box-shadow .2s ease;
+  transition: transform .2s ease, box-shadow .2s ease, background .25s ease, border-color .25s ease;
   border: 1px solid transparent;
 }
 .product-card:hover {
   transform: translateY(-3px);
   box-shadow: var(--shadow);
   border-color: var(--green-100);
+}
+
+/* In-cart highlight: subtle green ring + tint so it reads
+   as "you already added this" without shouting. */
+.product-card.in-cart {
+  border-color: var(--green-300);
+  background: linear-gradient(180deg, rgba(143, 190, 132, 0.10), var(--surface) 60%);
+  box-shadow: 0 0 0 1px var(--green-300), var(--shadow-sm);
+}
+.product-card.in-cart:hover {
+  box-shadow: 0 0 0 1px var(--green-300), var(--shadow);
+}
+[data-theme="dark"] .product-card.in-cart {
+  border-color: var(--green-500);
+  background: linear-gradient(180deg, rgba(126, 183, 138, 0.12), var(--surface) 60%);
+  box-shadow: 0 0 0 1px var(--green-500), var(--shadow-sm);
+}
+
+/* Notification-style count bubble (only shown when qty > 1) */
+.cart-count-bubble {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  min-width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--white);
+  font-size: .8rem;
+  font-weight: 700;
+  display: grid;
+  place-items: center;
+  padding: 0 7px;
+  border: 2px solid var(--surface);
+  box-shadow: var(--shadow);
+  z-index: 4;
+  animation: bubbleIn .35s cubic-bezier(.36, 1.5, .6, 1);
+  pointer-events: none;
+  letter-spacing: 0;
+  line-height: 1;
+}
+[data-theme="dark"] .cart-count-bubble {
+  color: #0F1416;
+  border-color: var(--surface);
+}
+.cart-count-bubble.pop { animation: bubbleIn .35s cubic-bezier(.36, 1.5, .6, 1); }
+
+@keyframes bubbleIn {
+  0%   { transform: scale(0);   opacity: 0; }
+  60%  { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(1);   opacity: 1; }
 }
 .product-card .placeholder-img {
   min-height: 160px;
@@ -714,7 +769,7 @@ textarea:-webkit-autofill {
 [data-theme="dark"] input:-webkit-autofill,
 [data-theme="dark"] textarea:-webkit-autofill {
   -webkit-text-fill-color: #ECF1EE !important;
-  -webkit-box-shadow: 0 0 0 1000px #1F2A26 inset !important;
+  -webkit-box-shadow: 0 0 0 1000px #2A1F12 inset !important;
 }
 
 .cz-footer {
@@ -964,8 +1019,8 @@ textarea:-webkit-autofill {
   flex: 1;
   padding: 12px 16px;
   border-radius: 999px;
-  border: 1px solid #4A5A52;
-  background: #2A332E;
+  border: 1px solid #5C4830;
+  background: #332818;
   color: var(--white);
   -webkit-text-fill-color: var(--white);
   font-family: inherit;
@@ -975,7 +1030,7 @@ textarea:-webkit-autofill {
 .newsletter input:focus {
   outline: none;
   border-color: var(--green-300);
-  background: #34403A;
+  background: #4A3823;
 }
 .newsletter input::placeholder { color: #B6C2BB; opacity: .85; }
 .newsletter .btn-primary { padding: .7em 1.4em; }
@@ -983,7 +1038,7 @@ textarea:-webkit-autofill {
   text-align: center;
   margin-top: 40px;
   padding-top: 20px;
-  border-top: 1px solid #2A332E;
+  border-top: 1px solid #332818;
   font-size: .85rem;
   color: #9BABA1;
 }
@@ -1273,6 +1328,159 @@ textarea:-webkit-autofill {
 }
 
 /* ==========================================================
+   PUBLIC AUTH UI  (Sign in / user chip / auth modal)
+   ========================================================== */
+.auth-slot { display: inline-flex; align-items: center; }
+.btn-link {
+  background: transparent;
+  border: none;
+  color: var(--primary-deep);
+  font-family: inherit;
+  font-size: .9rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 8px;
+  transition: background .15s, color .15s;
+}
+.btn-link:hover { background: var(--green-50); color: var(--accent-deep); }
+
+.user-chip-public {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 8px 3px 3px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--green-50);
+}
+.avatar-sm {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--green-300), var(--pink-300));
+  color: var(--white);
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  font-size: .78rem;
+  flex-shrink: 0;
+}
+.user-chip-public .user-name {
+  font-size: .85rem;
+  font-weight: 500;
+  color: var(--ink);
+}
+.user-chip-public .admin-link {
+  color: var(--accent-deep);
+  font-size: .82rem;
+  padding: 4px 8px;
+}
+.user-chip-public .logout-link {
+  color: var(--ink-soft);
+  font-size: .8rem;
+  padding: 4px 6px;
+}
+
+/* Auth modal */
+.auth-card-public { width: min(440px, 100%); }
+.auth-body { padding: 6px 22px 22px; }
+.auth-tabs {
+  display: flex;
+  background: var(--green-50);
+  border-radius: 12px;
+  padding: 4px;
+  margin-bottom: 18px;
+}
+.auth-tab {
+  flex: 1;
+  padding: 9px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: var(--ink-soft);
+  font-family: inherit;
+  font-size: .92rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background .15s, color .15s;
+}
+.auth-tab.active {
+  background: var(--white);
+  color: var(--ink);
+  box-shadow: var(--shadow-sm);
+}
+/* Stacked auth forms — both share the same grid cell so the
+   modal never jumps in height as you toggle tabs. */
+.auth-form-stack {
+  display: grid;
+}
+.auth-form-stack > .auth-form {
+  grid-column: 1;
+  grid-row: 1;
+  display: grid;
+  gap: 14px;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(4px);
+  transition:
+    opacity .22s ease,
+    transform .22s ease,
+    visibility 0s linear .22s;
+}
+.auth-form-stack > .auth-form.active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateY(0);
+  transition:
+    opacity .22s ease,
+    transform .22s ease,
+    visibility 0s linear 0s;
+}
+.auth-form label {
+  display: grid;
+  gap: 6px;
+  font-size: .82rem;
+  font-weight: 500;
+  color: var(--ink-soft);
+}
+.auth-form input {
+  padding: 11px 13px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--cream);
+  color: var(--ink);
+  font: inherit;
+  font-size: .95rem;
+  transition: border-color .15s, background .15s;
+}
+.auth-form input:focus {
+  outline: none;
+  border-color: var(--primary);
+  background: var(--white);
+}
+.form-error {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: rgba(193, 143, 30, 0.10);
+  color: var(--accent-deep);
+  font-size: .85rem;
+  border: 1px solid rgba(193, 143, 30, 0.25);
+}
+.auth-hint { margin: 6px 0 0; text-align: center; }
+[data-theme="dark"] .btn-link { color: var(--primary-deep); }
+[data-theme="dark"] .btn-link:hover { background: var(--green-100); }
+[data-theme="dark"] .user-chip-public { background: var(--green-100); border-color: var(--line); }
+
+@media (max-width: 520px) {
+  .user-chip-public .user-name,
+  .user-chip-public .admin-link { display: none; }
+  .btn-link { padding: 6px 10px; font-size: .85rem; }
+}
+
+/* ==========================================================
    THEME TOGGLE BUTTON
    ========================================================== */
 .theme-toggle .sun, .theme-toggle .moon {
@@ -1287,36 +1495,36 @@ textarea:-webkit-autofill {
    - Overrides color tokens; everything else inherits.
    ========================================================== */
 [data-theme="dark"] {
-  --green-50:  #1B2A22;
-  --green-100: #233B2F;
-  --green-200: #2E5A45;
-  --green-300: #4F8265;
-  --green-500: #7EB78A;
-  --green-700: #A9D8B0;
+  --green-50:  #251D14;     /* darkest brown surface tint */
+  --green-100: #332818;
+  --green-200: #4A3823;
+  --green-300: #6F543A;
+  --green-500: #C8AC81;     /* light tan (now reads brand in dark) */
+  --green-700: #DDC9A8;
 
-  --pink-50:   #2A1F22;
-  --pink-100: #3A2B2F;
-  --pink-200: #5A3D44;
-  --pink-300: #C57D87;
-  --pink-500: #E58A93;
-  --pink-700: #F2A6AE;
+  --pink-50:   #2A2310;
+  --pink-100: #3A2F18;
+  --pink-200: #58481E;
+  --pink-300: #C9A04F;
+  --pink-500: #FFD865;
+  --pink-700: #FFE48A;
 
-  --cream:     #14191A;
-  --ink:       #ECF1EE;
-  --ink-soft:  #9FB0A6;
-  --line:      #2B3331;
-  --white:     #1B2225;
+  --cream:     #1A140E;     /* very dark coffee bg */
+  --ink:       #F5EBD9;     /* warm white text */
+  --ink-soft:  #B8A892;     /* mid sand text */
+  --line:      #3A2F22;     /* dark brown border */
+  --white:     #221912;     /* dark brown surface */
 
-  --bg:        #0F1416;
-  --surface:   #1B2225;
-  --primary:   #7EB78A;
-  --primary-deep: #A9D8B0;
-  --accent:    #E58A93;
-  --accent-deep: #F2A6AE;
+  --bg:        #14100A;
+  --surface:   #221912;
+  --primary:   #C8AC81;
+  --primary-deep: #DDC9A8;
+  --accent:    #FFD865;
+  --accent-deep: #FFE48A;
 
-  --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.35);
-  --shadow:    0 8px 24px rgba(0, 0, 0, 0.45);
-  --shadow-lg: 0 24px 64px rgba(0, 0, 0, 0.6);
+  --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.45);
+  --shadow:    0 8px 24px rgba(0, 0, 0, 0.55);
+  --shadow-lg: 0 24px 64px rgba(0, 0, 0, 0.7);
 }
 [data-theme="dark"] .site-header { background: rgba(20, 25, 26, 0.85); }
 [data-theme="dark"] .announcement-bar { background: #0E1614; color: var(--green-700); }
@@ -1330,14 +1538,14 @@ textarea:-webkit-autofill {
 [data-theme="dark"] .site-footer { background: #0B0F10; color: #C8D3CC; }
 [data-theme="dark"] .site-footer .muted { color: #A8B4AC; }
 [data-theme="dark"] .newsletter input {
-  background: #1F2A26;
-  border-color: #3A4A40;
+  background: #2A1F12;
+  border-color: #4A3823;
   color: #ECF1EE;
   -webkit-text-fill-color: #ECF1EE;
 }
 [data-theme="dark"] .newsletter input:focus {
   border-color: var(--primary);
-  background: #263530;
+  background: #332818;
 }
 [data-theme="dark"] .newsletter input::placeholder { color: #8FA095; opacity: .9; }
 
@@ -1366,7 +1574,7 @@ textarea:-webkit-autofill {
 [data-theme="dark"] .chip {
   background: var(--surface);
   color: var(--ink);
-  border-color: #2E3A33;
+  border-color: #3A2F22;
 }
 [data-theme="dark"] .chip.active {
   background: #2E5A45;          /* darker green so light text reads */

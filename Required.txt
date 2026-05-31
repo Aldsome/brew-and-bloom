@@ -1,0 +1,320 @@
+================================================================
+BREW & BLOOM — UNFINISHED WORK / BACKEND-BLOCKED TODOs
+================================================================
+Date: 2026-05-31
+Audience: future-you (or whoever picks this up)
+
+This file lists every TODO that is intentionally NOT implemented
+because it requires a real backend, real API keys, or a real
+service that GitHub Pages alone cannot provide.
+
+Each entry has:
+  - WHAT  : the feature
+  - WHY   : why it can't be done client-side only
+  - HOW   : the concrete path to satisfy it
+  - WHERE : the source file + function to swap
+
+================================================================
+SECTION A — AUTHENTICATION & USER MANAGEMENT
+================================================================
+
+A1. Real user registration (with verified email)
+    WHAT  : Anyone visits admin.html → registers with their real
+            email → receives a verification link → clicks it →
+            account becomes usable.
+    WHY   : Sending email requires SMTP credentials. SMTP
+            credentials cannot be exposed to a browser.
+            Also, the user list lives only in the registering
+            browser's localStorage today.
+    HOW   : Use Supabase Auth (free tier) or Firebase Auth.
+            Both handle email verification, password reset,
+            session tokens, and rate-limiting out of the box.
+            Recommended for this project: SUPABASE.
+              1. Create a Supabase project at supabase.com.
+              2. npm install @supabase/supabase-js (or use the
+                 ESM CDN: https://esm.sh/@supabase/supabase-js)
+              3. In store.js, replace `registerUser()`, `login()`,
+                 `logout()`, `getSession()`, `getUsers()` with
+                 the Supabase equivalents.
+              4. Delete `hashPassword()` and `PEPPER` — Supabase
+                 hashes server-side.
+    WHERE : store.js — search for "BACKEND TODO".
+
+A2. Cross-device login
+    WHAT  : User registers on phone, logs in on laptop.
+    WHY   : localStorage is per-origin per-browser per-device.
+    HOW   : Same as A1. Once the user database lives in
+            Supabase/Firebase, it's accessible from anywhere.
+    WHERE : store.js.
+
+A3. Password reset / "forgot password"
+    WHAT  : Click "Forgot password" → email arrives → reset.
+    WHY   : Same as A1 (requires email + token storage).
+    HOW   : Supabase: `supabase.auth.resetPasswordForEmail()`.
+            Add a "Forgot password" link to the login form and
+            a reset page that listens for the recovery token in
+            the URL.
+    WHERE : admin.html (add link) + new password-reset.html.
+
+A4. Force-change for default admin password
+    WHAT  : First time admin@admin.com logs in, they MUST change
+            the password before reaching the dashboard.
+    WHY   : The default credentials are public in BUGS.md and the
+            login screen hint. Until changed, anyone can sign in
+            as admin.
+    HOW   : Add a `mustChangePassword: true` flag on the seeded
+            user. After successful login, if the flag is set,
+            redirect to a "change password" panel and block
+            navigation until they comply.
+            This CAN be done in localStorage today as a stopgap
+            until backend auth is wired.
+    WHERE : store.js (`seedIfEmpty`, `login`) + admin.js
+            (after-login routing).
+
+A5. Account lockout / rate-limiting
+    WHAT  : After N failed logins, the account locks for X minutes.
+    WHY   : No server, no shared counter.
+    HOW   : Supabase Auth has this built in. Or Cloudflare
+            Turnstile / hCaptcha on the login form.
+    WHERE : store.js (`login()`).
+
+A6. Audit log of admin actions
+    WHAT  : "On 2026-05-31 12:14, admin@... deleted item c3."
+    WHY   : Need durable, append-only storage off the client.
+    HOW   : Supabase: insert into an `admin_audit` table after
+            every Store.* mutation. Add a panel in admin.html
+            to view it.
+    WHERE : Wrap mutations in store.js with an audit emit.
+
+
+================================================================
+SECTION B — FILE UPLOADS / IMAGE STORAGE
+================================================================
+
+B1. Real image uploads (not data URLs in localStorage)
+    WHAT  : Admin uploads an image once; every device sees it.
+            Today: images become base64 data URLs in localStorage.
+    WHY   : localStorage has a ~5–10 MB total quota. Cross-device
+            sharing requires a real CDN / object store.
+    HOW   : Supabase Storage is the easiest matching path.
+              1. Create a public bucket called "brew-bloom-images".
+              2. Replace the upload handler in admin.js
+                 (`$$('.img-file').forEach...`) so it calls
+                 `supabase.storage.from('brew-bloom-images').upload(...)`
+                 and stores the returned public URL — not the data URL.
+              3. Update the menu schema in store.js so `img` is a
+                 plain URL string (already is).
+            Alternatives: Cloudinary (free tier, includes auto
+            resize), Firebase Storage, S3.
+    WHERE : admin.js — `$$('.img-file').forEach((input) => ...)`.
+
+B2. Client-side image compression
+    WHAT  : Resize images to ~1200×900 and JPEG-encode at q=0.8
+            before upload, so users don't push 4 MB phone photos.
+    WHY   : Storage cost + page load speed.
+    HOW   : Use a `<canvas>` to draw the image at the new size,
+            then `canvas.toBlob('image/jpeg', 0.8)`.
+            Can be done client-side TODAY, doesn't need a backend.
+    WHERE : admin.js — wrap `readAsDataURL` in a `resize()`.
+
+
+================================================================
+SECTION C — PAYMENTS
+================================================================
+
+C1. GCash integration
+    WHAT  : Customer picks GCash → redirected to GCash pay flow →
+            confirmation comes back → order marked PAID.
+    WHY   : Requires a server endpoint to:
+              (a) hold the secret API key
+              (b) create a charge with the provider
+              (c) receive the webhook confirmation
+    HOW   : Use PayMongo or Xendit (both support GCash in PH).
+            Recommended: PayMongo because their docs match the
+            Philippine market closely.
+              1. Sign up at paymongo.com / xendit.co
+              2. Build a tiny backend (Vercel Functions /
+                 Netlify Functions / Supabase Edge Functions).
+              3. POST /api/checkout → server creates a Source,
+                 returns the redirect URL.
+              4. Provider POSTs /api/webhook → server marks the
+                 order paid, sends customer a confirmation email.
+              5. In script.js, replace the `case 'gcash':` stub
+                 in `submitOrder()` with a call to /api/checkout.
+    WHERE : script.js → `submitOrder()` → switch case.
+
+C2. Maya integration
+    Same pattern as C1, different SDK.
+    Docs: developers.maya.ph.
+
+C3. Online banking (BPI/BDO/UnionBank/etc.)
+    Same pattern as C1.
+    PayMongo and Xendit both offer a "bank redirect" source type.
+
+C4. Credit/debit card
+    WHAT  : Tokenize card details client-side so the secret never
+            touches your server. PCI compliance.
+    HOW   : Stripe Elements (international) or PayMongo's
+            JS SDK (PH-friendly).
+            NEVER store raw card numbers anywhere — even briefly.
+    WHERE : index.html → checkout form → swap the plain
+            `<input name="cardNumber">` for the provider's
+            iframe-based input.
+
+C5. Order receipt email
+    WHAT  : Customer gets an email confirmation after payment.
+    HOW   : Backend triggers SendGrid / Mailgun / Resend after
+            payment confirmation webhook lands.
+
+C6. Order persistence
+    WHAT  : Today, "Place Order" wipes the cart and shows a toast.
+            No record of the order exists anywhere.
+    HOW   : Server-side: insert into an `orders` table.
+            Customer-facing: show the customer their order in a
+            "My orders" page (also requires logged-in customer —
+            see Section D).
+    WHERE : script.js → `submitOrder()`.
+
+
+================================================================
+SECTION D — CUSTOMER-FACING FEATURES (mentioned for later)
+================================================================
+
+D1. Optional customer login with perks + history
+    Original user note: "Logins are now required to modify the
+    website. Guest users are still allowed to order, no login
+    required (Login optional, with perks and history. but for
+    later)"
+    WHAT  : Add a "Sign in" button on the public site. Logged-in
+            customers see saved addresses, favorite drinks,
+            order history, loyalty points.
+    HOW   : Reuse the Supabase Auth instance from A1. Add a
+            small login button to index.html and a /account
+            section. Reads/writes a `customer_profile` table.
+
+D2. Favorites
+    WHAT  : Heart icon on each menu card.
+    HOW   : `customer_profile.favorites = [itemId, ...]`.
+
+D3. Order tracking
+    WHAT  : "Your order is being prepared / out for delivery /
+            delivered." Real-time updates.
+    HOW   : Backend posts status changes; Supabase Realtime or
+            a simple polling endpoint pushes them to the customer.
+
+D4. Loyalty / promo codes
+    WHAT  : "BLOOM10" → 10% off.
+    HOW   : Codes table on backend. Applied during checkout
+            after server-side validation (NEVER trust the client
+            to apply discounts).
+
+
+================================================================
+SECTION E — INFRASTRUCTURE / DEPLOYMENT
+================================================================
+
+E1. Hosting that supports a backend
+    WHAT  : GitHub Pages is static-only. To run any server code
+            you need a host that supports functions.
+    OPTIONS:
+      - Vercel (free tier, generous, supports Next.js + Serverless)
+      - Netlify (similar)
+      - Cloudflare Pages + Workers
+      - Render.com (simple Node hosting)
+    HOW   : Move the repo to Vercel. The static files keep working
+            from /public. Add /api/* for server routes.
+
+E2. Database
+    WHAT  : Need persistent shared storage for users, orders,
+            menu, audit, etc.
+    OPTIONS:
+      - Supabase (PostgreSQL + Auth + Storage + Realtime, free tier)
+      - PlanetScale (MySQL)
+      - Neon (PostgreSQL)
+      - Firebase Firestore
+    PICK ONE — recommendation: Supabase, because it bundles
+    everything you need (database, auth, storage, edge functions)
+    in one project under a single free tier.
+
+E3. Environment variables
+    WHAT  : Secret keys (Supabase service key, payment provider
+            secrets, SMTP password) must NOT live in source code.
+    HOW   : Vercel/Netlify environment variables. Reference them
+            on the server only. The client only sees publishable
+            keys.
+
+E4. HTTPS-only cookies for session
+    WHAT  : Replace localStorage session with a `Secure;HttpOnly;
+            SameSite=Lax` cookie set by the backend.
+    WHY   : XSS-proof. localStorage tokens are readable by any
+            JS on the page.
+
+E5. Backups
+    WHAT  : Nightly export of the database to durable storage.
+    HOW   : Supabase has scheduled backups on paid tiers. On the
+            free tier, set up a cron job that calls `pg_dump`.
+
+E6. Monitoring + error tracking
+    WHAT  : Know when the site breaks before users tell you.
+    HOW   : Sentry (free tier). Drop a tag in index.html and
+            admin.html. Errors stream to a dashboard.
+
+
+================================================================
+SECTION F — STOPGAP IMPROVEMENTS POSSIBLE TODAY
+================================================================
+
+These don't need a backend, but they need code I haven't
+written yet:
+
+F1. Cleanup of cart lines whose item was deleted in admin
+    Add to script.js `updateCart()`:
+      state.cart = state.cart.filter(line =>
+        MENU.some(m => m.id === line.id));
+
+F2. Sanitize admin-entered text
+    In script.js `applyStoreConfig()`, replace the `<br/>`
+    conversion with `white-space: pre-line` CSS so the raw
+    `\n` rendered safely instead of converting to HTML.
+
+F3. Client-side image resize
+    See B2 above. Pure browser code.
+
+F4. Force admin password change on first login
+    See A4 above. Pure localStorage code; works today.
+
+F5. Focus trap on modals
+    Pick the first focusable inside the modal on open; on Tab,
+    if focus would leave, redirect to first/last. Few lines of JS.
+
+F6. Persist last-visited admin panel in localStorage
+    Save `state.section` on every `navigate()`; restore on boot.
+
+
+================================================================
+RECOMMENDED ORDER OF ATTACK
+================================================================
+
+If you want to upgrade this into a real product, do these in
+order:
+
+1. Move to Vercel hosting (E1).
+2. Create a Supabase project, point store.js at it (A1, A2, B1).
+3. Replace data URLs with Supabase Storage uploads (B1, B2).
+4. Wire ONE payment provider end-to-end (start with PayMongo +
+   GCash) (C1).
+5. Add order persistence and a customer "My orders" page (C6, D1).
+6. Add the remaining payment methods (C2–C4).
+7. Polish: audit log, password reset, password reset, rate-limit
+   (A3, A5, A6).
+8. Add E4 (cookies), E5 (backups), E6 (Sentry) before going live
+   to real customers.
+
+Estimated total effort for #1–#4 above: ~2–3 focused days for
+someone comfortable with Supabase + a JS framework. The current
+code is structured so the backend swap is mostly local to
+store.js + admin.js → a couple of files, not the whole codebase.
+
+================================================================
+END OF FILE
+================================================================

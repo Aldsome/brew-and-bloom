@@ -14,7 +14,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 
   <!-- Bump ?v=N when you push CSS/JS changes to bust the browser cache -->
-  <link rel="stylesheet" href="style.css?v=12" />
+  <link rel="stylesheet" href="style.css?v=16" />
 
   <!-- Apply saved theme before paint to avoid flash -->
   <script>
@@ -57,6 +57,11 @@
       </nav>
 
       <div class="nav-actions">
+        <!-- Auth slot: signed-out shows "Sign in", signed-in shows user chip -->
+        <div class="auth-slot" id="authSlot">
+          <button class="btn-link" id="openAuthBtn">Sign in</button>
+        </div>
+
         <button class="icon-btn theme-toggle" id="themeToggleBtn" aria-label="Toggle night mode">
           <svg class="sun" viewBox="0 0 24 24" aria-hidden="true">
             <circle cx="12" cy="12" r="4" fill="currentColor"/>
@@ -484,10 +489,68 @@
   </div>
 
   <!-- ==========================================================
+       AUTH MODAL  (login + register tabs)
+       - Optional for customers (guests can still order).
+       - Admin sign-in is the same flow — once signed in as
+         admin, a link to admin.html appears in the user chip.
+       ========================================================== -->
+  <div class="modal" id="authModal" aria-hidden="true">
+    <div class="modal-card auth-card-public" role="dialog" aria-labelledby="authTitle">
+      <div class="modal-head">
+        <h3 id="authTitle">Welcome to Brew &amp; Bloom</h3>
+        <button class="icon-btn close-btn" id="closeAuthBtn" aria-label="Close">✕</button>
+      </div>
+
+      <div class="auth-body">
+        <div class="auth-tabs" role="tablist">
+          <button class="auth-tab active" data-auth-tab="login" role="tab">Sign in</button>
+          <button class="auth-tab"        data-auth-tab="register" role="tab">Create account</button>
+        </div>
+
+        <!-- Stacked forms: both share the same grid cell so the
+             modal never jumps in height as you toggle tabs. -->
+        <div class="auth-form-stack">
+          <!-- Login -->
+          <form class="auth-form active" id="publicLoginForm" autocomplete="on">
+            <label>Email
+              <input type="email" name="email" required autocomplete="username" placeholder="you@example.com" />
+            </label>
+            <label>Password
+              <input type="password" name="password" required autocomplete="current-password" minlength="8" />
+            </label>
+            <p class="form-error" id="publicLoginError" hidden></p>
+            <button type="submit" class="btn btn-primary btn-block">Sign in</button>
+            <p class="auth-hint muted small">
+              Signing in is optional — guests can still order. Logging in saves your details for faster checkout.
+            </p>
+          </form>
+
+          <!-- Register -->
+          <form class="auth-form" id="publicRegisterForm" autocomplete="on">
+            <label>Name
+              <input type="text" name="name" required placeholder="Your name" />
+            </label>
+            <label>Email
+              <input type="email" name="email" required autocomplete="username" placeholder="you@example.com" />
+            </label>
+            <label>Password
+              <input type="password" name="password" required autocomplete="new-password" minlength="8" />
+              <small class="muted">8+ characters. Stored locally for now — see BUGS.md.</small>
+            </label>
+            <p class="form-error" id="publicRegisterError" hidden></p>
+            <button type="submit" class="btn btn-primary btn-block">Create account</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================
        CONFIRMATION TOAST
        ========================================================== -->
   <div class="toast" id="toast" aria-live="polite"></div>
 
-  <script src="script.js?v=4"></script>
+  <script src="store.js?v=3"></script>
+  <script src="script.js?v=8"></script>
 </body>
 </html>

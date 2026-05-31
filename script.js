@@ -48,79 +48,25 @@ const ADDONS = [
 
 /* ==========================================================
    MENU DATA
-   - options: which groups apply (default = all four for drinks).
-     pastries skip milk/sugar/temp, etc.
+   - Now loaded from Store.getMenu(), so admin edits in
+     admin.html flow through to this customer-facing site.
+   - The original hardcoded array still lives in store.js as
+     DEFAULT_MENU and is what you see on a first visit.
    ========================================================== */
-/* ==========================================================
-   IMAGE HELPER
-   - Hot-links free, topic-tagged photos via loremflickr.
-   - `lock` keeps the same image for the same URL on every
-     visit so layout doesn't shuffle on reload.
-   - If a URL ever fails, the gradient placeholder shows
-     through underneath (handled by .placeholder-img CSS).
-   ========================================================== */
-const img = (topic, lock, w = 600, h = 420) =>
-  `https://loremflickr.com/${w}/${h}/${encodeURIComponent(topic)}?lock=${lock}`;
+let MENU = (typeof Store !== 'undefined' && Store.getMenu)
+  ? Store.getMenu()
+  : (typeof DEFAULT_MENU !== 'undefined' ? DEFAULT_MENU : []);
 
-const MENU = [
-  // ----- Coffee -----
-  { id: 'c1', name: 'Classic Espresso',  category: 'coffee', price: 120, emoji: '☕', rating: 4.9, desc: 'Bold double shot, rich crema.', tag: 'Bestseller',
-    img: img('espresso,coffee', 101),
-    options: { size: true, temp: false, milk: false, sugar: true, addons: true } },
-  { id: 'c2', name: 'Caramel Macchiato', category: 'coffee', price: 175, emoji: '☕', rating: 4.8, desc: 'Vanilla, caramel, layered milk.',
-    img: img('caramel,latte,coffee', 102),
-    options: { size: true, temp: true, milk: true, sugar: true, addons: true } },
-  { id: 'c3', name: 'Pink Rose Latte',   category: 'coffee', price: 185, emoji: '🌸', rating: 4.9, desc: 'Rose syrup, oat milk, espresso.', tag: 'New',
-    img: img('latte,rose,rose', 103),
-    options: { size: true, temp: true, milk: true, sugar: true, addons: true } },
-  { id: 'c4', name: 'Spanish Latte',     category: 'coffee', price: 165, emoji: '☕', rating: 4.7, desc: 'Sweet condensed milk + espresso.',
-    img: img('latte,coffeeart', 104),
-    options: { size: true, temp: true, milk: true, sugar: true, addons: true } },
-
-  // ----- Tea -----
-  { id: 't1', name: 'Matcha Bloom',      category: 'tea',    price: 180, emoji: '🍵', rating: 4.9, desc: 'Ceremonial matcha, vanilla cream.', tag: 'New',
-    img: img('matcha,green,tea', 201),
-    options: { size: true, temp: true, milk: true, sugar: true, addons: true } },
-  { id: 't2', name: 'Jasmine Green',     category: 'tea',    price: 140, emoji: '🍵', rating: 4.6, desc: 'Hand-picked jasmine blossoms.',
-    img: img('greentea,teacup', 202),
-    options: { size: true, temp: true, milk: false, sugar: true, addons: true } },
-  { id: 't3', name: 'Strawberry Sakura', category: 'tea',    price: 165, emoji: '🌸', rating: 4.8, desc: 'Strawberry, sakura, sparkling.',
-    img: img('strawberry,drink', 203),
-    options: { size: true, temp: false, milk: false, sugar: true, addons: true } },
-
-  // ----- Cold Brews ----- (temp fixed to iced)
-  { id: 'b1', name: 'Cold Brew Original',category: 'cold',   price: 160, emoji: '🧊', rating: 4.8, desc: '12-hour steep, smooth & sweet.',
-    img: img('coldbrew,icedcoffee', 301),
-    options: { size: true, temp: false, milk: true, sugar: true, addons: true } },
-  { id: 'b2', name: 'Iced Pink Latte',   category: 'cold',   price: 195, emoji: '🧊', rating: 4.9, desc: 'Strawberry milk + cold espresso.',
-    img: img('pink latte,latte', 302),
-    options: { size: true, temp: false, milk: true, sugar: true, addons: true } },
-  { id: 'b3', name: 'Tropical Cold Foam',category: 'cold',   price: 180, emoji: '🧊', rating: 4.7, desc: 'Mango cold foam over black tea.',
-    img: img('icedtea,mango', 303),
-    options: { size: true, temp: false, milk: false, sugar: true, addons: true } },
-
-  // ----- Pastries ----- (no drink-options)
-  { id: 'p1', name: 'Butter Croissant',  category: 'pastry', price: 95,  emoji: '🥐', rating: 4.8, desc: 'Flaky, golden, baked daily.',
-    img: img('croissant,bread', 401),
-    options: { size: false, temp: false, milk: false, sugar: false, addons: false } },
-  { id: 'p2', name: 'Matcha Bun',        category: 'pastry', price: 110, emoji: '🥯', rating: 4.7, desc: 'Soft milk bun with matcha cream.',
-    img: img('bun,matcha,', 402),
-    options: { size: false, temp: false, milk: false, sugar: false, addons: false } },
-  { id: 'p3', name: 'Strawberry Tart',   category: 'pastry', price: 135, emoji: '🍰', rating: 4.9, desc: 'Vanilla custard, fresh berries.',
-    img: img('tart,strawberry,dessert', 403),
-    options: { size: false, temp: false, milk: false, sugar: false, addons: false } },
-  { id: 'p4', name: 'Chocolate Cookie',  category: 'pastry', price: 75,  emoji: '🍪', rating: 4.6, desc: 'Gooey center, sea-salt finish.',
-    img: img('cookie,chocolate', 404),
-    options: { size: false, temp: false, milk: false, sugar: false, addons: false } },
-
-  // ----- Bundles -----
-  { id: 'd1', name: "Barista's Bundle",  category: 'bundle', price: 420, emoji: '🎁', rating: 5.0, desc: '2 drinks + 1 pastry, save ₱90.', tag: 'Save',
-    img: img('coffee,pastry,cafe', 501),
-    options: { size: false, temp: false, milk: false, sugar: false, addons: false } },
-  { id: 'd2', name: 'Sunrise Set',       category: 'bundle', price: 260, emoji: '🌅', rating: 4.8, desc: 'Espresso + croissant combo.',
-    img: img('expresso,coffee,croissant', 502),
-    options: { size: false, temp: false, milk: false, sugar: false, addons: false } },
-];
+/* Re-read the menu on every visibility change so the
+   customer site picks up admin edits without a hard reload. */
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && typeof Store !== 'undefined') {
+    MENU = Store.getMenu();
+    if (typeof applyStoreConfig === 'function') applyStoreConfig();
+    if (typeof renderMenu === 'function')     renderMenu();
+    if (typeof renderFeatured === 'function') renderFeatured();
+  }
+});
 
 /* ==========================================================
    CONFIG
@@ -306,7 +252,7 @@ function renderMenu() {
   };
 
   menuGrid.innerHTML = items.map(item => `
-    <article class="product-card" data-id="${item.id}">
+    <article class="product-card" data-id="${item.id}" data-category="${item.category}">
       <div class="placeholder-img product-img" aria-hidden="true">
         <img src="${item.img}" alt="${item.name}" loading="lazy"
              onerror="this.style.display='none'">
@@ -326,12 +272,56 @@ function renderMenu() {
       </div>
     </article>
   `).join('');
+
+  updateMenuCardStates();
 }
 
 /* ==========================================================
    CART HELPERS
    ========================================================== */
 function findLine(lineKey) { return state.cart.find(l => l.lineKey === lineKey); }
+
+/* Total quantity of an item across all customization variants
+   (Pink Rose Latte with oat + same drink with almond = 2). */
+function cartQtyForItem(itemId) {
+  return state.cart
+    .filter(l => l.id === itemId)
+    .reduce((sum, l) => sum + l.qty, 0);
+}
+
+/* ==========================================================
+   IN-CART INDICATORS ON MENU CARDS
+   - Adds .in-cart class for the soft ring/tint highlight.
+   - Adds a notification bubble with the count only when > 1.
+   - Called after every cart change + after re-rendering the
+     menu (e.g. when switching category).
+   ========================================================== */
+function updateMenuCardStates() {
+  document.querySelectorAll('.product-card').forEach(card => {
+    const id  = card.dataset.id;
+    const qty = cartQtyForItem(id);
+
+    card.classList.toggle('in-cart', qty > 0);
+
+    let bubble = card.querySelector('.cart-count-bubble');
+    if (qty > 1) {
+      if (!bubble) {
+        bubble = document.createElement('span');
+        bubble.className = 'cart-count-bubble';
+        bubble.setAttribute('aria-label', `${qty} in cart`);
+        card.appendChild(bubble);
+      } else if (+bubble.textContent !== qty) {
+        // Re-trigger pop animation when count actually changes.
+        bubble.classList.remove('pop');
+        void bubble.offsetWidth;
+        bubble.classList.add('pop');
+      }
+      bubble.textContent = qty;
+    } else if (bubble) {
+      bubble.remove();
+    }
+  });
+}
 
 function addLine(itemId, config, qty = 1) {
   const lineKey = lineKeyOf(itemId, config);
@@ -433,6 +423,8 @@ function updateCart() {
   checkoutTotalEl.textContent  = peso(total);
 
   checkoutBtn.disabled = count === 0;
+
+  updateMenuCardStates();
 }
 
 /* ==========================================================
@@ -878,10 +870,211 @@ function bindEvents() {
 /* ==========================================================
    INIT
    ========================================================== */
+/* ==========================================================
+   AUTH (public site)
+   - Optional. Guests can still browse + order.
+   - Shares Store.* with admin.html, so an admin can sign in
+     here and jump straight to the admin panel.
+   ========================================================== */
+function refreshAuthUI() {
+  const slot = $('#authSlot');
+  if (!slot || typeof Store === 'undefined') return;
+  const session = Store.getSession();
+
+  if (!session) {
+    slot.innerHTML = `<button class="btn-link" id="openAuthBtn">Sign in</button>`;
+    $('#openAuthBtn').addEventListener('click', openAuth);
+    return;
+  }
+
+  const initial = (session.name || session.email).charAt(0).toUpperCase();
+  const adminLink = session.role === 'admin'
+    ? `<a href="admin.html" class="btn-link admin-link">Admin</a>`
+    : '';
+  slot.innerHTML = `
+    <div class="user-chip-public" title="${session.email}">
+      <span class="avatar-sm">${initial}</span>
+      <span class="user-name">${session.name || session.email.split('@')[0]}</span>
+      ${adminLink}
+      <button class="btn-link logout-link" id="logoutBtn">Sign out</button>
+    </div>
+  `;
+  $('#logoutBtn').addEventListener('click', () => {
+    Store.logout();
+    showToast('Signed out');
+    refreshAuthUI();
+  });
+}
+
+function openAuth() {
+  const modal = $('#authModal');
+  if (!modal) return;
+  modal.classList.add('open');
+  modal.setAttribute('aria-hidden', 'false');
+  document.body.style.overflow = 'hidden';
+}
+function closeAuth() {
+  const modal = $('#authModal');
+  if (!modal) return;
+  modal.classList.remove('open');
+  modal.setAttribute('aria-hidden', 'true');
+  document.body.style.overflow = '';
+}
+
+function bindAuthEvents() {
+  // Tabs — crossfade via .active (no height jump)
+  document.querySelectorAll('#authModal .auth-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('#authModal .auth-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      const which = tab.dataset.authTab;
+      $('#publicLoginForm').classList.toggle('active',    which === 'login');
+      $('#publicRegisterForm').classList.toggle('active', which === 'register');
+    });
+  });
+
+  $('#closeAuthBtn')?.addEventListener('click', closeAuth);
+
+  // Login
+  $('#publicLoginForm')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const errEl = $('#publicLoginError');
+    errEl.hidden = true;
+    const fd = new FormData(e.target);
+    try {
+      const session = await Store.login({
+        email:    fd.get('email'),
+        password: fd.get('password'),
+      });
+      showToast(`Welcome back, ${session.name}`);
+      e.target.reset();
+      closeAuth();
+      refreshAuthUI();
+    } catch (err) {
+      errEl.textContent = err.message;
+      errEl.hidden = false;
+    }
+  });
+
+  // Register
+  $('#publicRegisterForm')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const errEl = $('#publicRegisterError');
+    errEl.hidden = true;
+    const fd = new FormData(e.target);
+    try {
+      await Store.registerUser({
+        email:    fd.get('email'),
+        password: fd.get('password'),
+        name:     fd.get('name'),
+        role:     'customer',
+      });
+      await Store.login({
+        email:    fd.get('email'),
+        password: fd.get('password'),
+      });
+      showToast(`Account created — welcome!`);
+      e.target.reset();
+      closeAuth();
+      refreshAuthUI();
+    } catch (err) {
+      errEl.textContent = err.message;
+      errEl.hidden = false;
+    }
+  });
+
+  // Backdrop close (drag-safe pattern reused from existing modals)
+  const m = $('#authModal');
+  if (m) {
+    let startedOnBackdrop = false;
+    m.addEventListener('mousedown', e => { startedOnBackdrop = (e.target === m); });
+    m.addEventListener('mouseup',   e => {
+      if (startedOnBackdrop && e.target === m) closeAuth();
+      startedOnBackdrop = false;
+    });
+  }
+
+  // ESC close
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && $('#authModal')?.classList.contains('open')) closeAuth();
+  });
+}
+
+/* ==========================================================
+   APPLY ADMIN-EDITED CONFIG TO THE PAGE
+   - Reads Store.getConfig() and patches the heading copy,
+     hero image, about text/image, contact info, etc.
+   - Reads Store.getEnabledPaymentMethods() and hides any
+     payment option that's been turned off in the admin.
+   ========================================================== */
+function applyStoreConfig() {
+  if (typeof Store === 'undefined') return;
+  const cfg = Store.getConfig();
+
+  const setText = (sel, val) => {
+    const el = document.querySelector(sel);
+    if (el && val !== undefined) el.textContent = val;
+  };
+  const setHTML = (sel, val) => {
+    const el = document.querySelector(sel);
+    if (el && val !== undefined) el.innerHTML = val.replace(/\n/g, '<br/>');
+  };
+  const setSrc = (sel, val) => {
+    const el = document.querySelector(sel);
+    if (el && val) el.src = val;
+  };
+
+  // Announcement bar
+  setText('.announcement-bar span', cfg.announcement);
+
+  // Brand name (header + footer)
+  document.title = `${cfg.brandName} — Artisan Coffee, Delivered`;
+  document.querySelectorAll('.brand-name').forEach(el => el.textContent = cfg.brandName);
+
+  // Hero
+  setText('.eyebrow', cfg.heroEyebrow);
+  setHTML('.hero-copy h1', cfg.heroTitle);
+  setText('.hero-copy .lede', cfg.brandTagline);
+  setSrc('.hero-placeholder img', cfg.heroImage);
+
+  // About
+  const aboutH2 = document.querySelector('.about-copy h2');
+  if (aboutH2) aboutH2.textContent = cfg.aboutTitle;
+  const aboutP = document.querySelector('.about-copy > p:not(.eyebrow)');
+  if (aboutP) aboutP.textContent = cfg.aboutBody;
+  setSrc('.about-img img', cfg.aboutImage);
+
+  // Footer contact
+  const footerCols = document.querySelectorAll('.footer-grid > div');
+  if (footerCols[0]) {
+    const ps = footerCols[0].querySelectorAll('p.muted');
+    if (ps[0]) ps[0].textContent = cfg.hours;
+    if (ps[1]) ps[1].textContent = cfg.contactAddress;
+  }
+  if (footerCols[1]) {
+    const ps = footerCols[1].querySelectorAll('p.muted');
+    if (ps[0]) ps[0].textContent = cfg.contactPhone;
+    if (ps[1]) ps[1].textContent = cfg.contactEmail;
+  }
+
+  // Hide disabled payment methods on checkout
+  const enabled = Store.getEnabledPaymentMethods();
+  document.querySelectorAll('.pay-options .pay-option').forEach(opt => {
+    const radio = opt.querySelector('input[type="radio"]');
+    if (!radio) return;
+    const method = radio.value;
+    if (enabled[method] === false) opt.style.display = 'none';
+    else                            opt.style.display = '';
+  });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   initTheme();
+  applyStoreConfig();
   renderFeatured();
   renderMenu();
   updateCart();
   bindEvents();
+  bindAuthEvents();
+  refreshAuthUI();
 });
