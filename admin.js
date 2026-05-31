@@ -50,13 +50,24 @@ function setError(el, msg) {
 }
 
 async function bootAuth() {
-  await Store.seedIfEmpty();
-  const session = Store.getSession();
-  if (session) {
-    enterApp(session);
-  } else {
-    showGate();
+  // Lock the login/register submit buttons until the seed
+  // finishes. Without this, a fast user can submit BEFORE the
+  // seed re-syncs the default admin's password — meaning their
+  // first attempt compares against a stale stored hash.
+  const submitBtns = $$('#loginForm button[type="submit"], #registerForm button[type="submit"]');
+  submitBtns.forEach(b => { b.disabled = true; b.dataset.busyLabel = b.textContent; b.textContent = 'Loading…'; });
+
+  try {
+    await Store.seedIfEmpty();
+  } catch (e) {
+    console.error('[Admin] seed failed:', e);
+  } finally {
+    submitBtns.forEach(b => { b.disabled = false; b.textContent = b.dataset.busyLabel || b.textContent; });
   }
+
+  const session = Store.getSession();
+  if (session) enterApp(session);
+  else         showGate();
 }
 
 function enterApp(session) {

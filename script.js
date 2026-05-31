@@ -888,14 +888,13 @@ function refreshAuthUI() {
   }
 
   const initial = (session.name || session.email).charAt(0).toUpperCase();
-  const adminLink = session.role === 'admin'
-    ? `<a href="admin.html" class="btn-link admin-link">Admin</a>`
-    : '';
+  // No Admin link here on purpose — the admin URL is intentionally
+  // hidden from the public UI. Admins are auto-redirected to
+  // admin.html from the login form when their role === 'admin'.
   slot.innerHTML = `
     <div class="user-chip-public" title="${session.email}">
       <span class="avatar-sm">${initial}</span>
       <span class="user-name">${session.name || session.email.split('@')[0]}</span>
-      ${adminLink}
       <button class="btn-link logout-link" id="logoutBtn">Sign out</button>
     </div>
   `;
@@ -935,19 +934,31 @@ function bindAuthEvents() {
 
   $('#closeAuthBtn')?.addEventListener('click', closeAuth);
 
-  // Login
+  // Login — admins are auto-routed to the admin console.
   $('#publicLoginForm')?.addEventListener('submit', async (e) => {
     e.preventDefault();
     const errEl = $('#publicLoginError');
     errEl.hidden = true;
     const fd = new FormData(e.target);
     try {
+      // Make sure the default-admin seed has had a chance to run
+      // before we hash the input — prevents a stale-hash race.
+      if (typeof Store.seedIfEmpty === 'function') await Store.seedIfEmpty();
+
       const session = await Store.login({
         email:    fd.get('email'),
         password: fd.get('password'),
       });
-      showToast(`Welcome back, ${session.name}`);
       e.target.reset();
+
+      if (session.role === 'admin') {
+        showToast(`Welcome, ${session.name} — redirecting to admin…`);
+        // Brief delay so the toast is visible before the navigation.
+        setTimeout(() => { window.location.href = 'admin.html'; }, 600);
+        return;
+      }
+
+      showToast(`Welcome back, ${session.name}`);
       closeAuth();
       refreshAuthUI();
     } catch (err) {
